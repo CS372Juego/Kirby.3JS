@@ -17,8 +17,8 @@ export class Portal {
         const distance = kirby.position.distanceTo(this.mesh.position);
         const isFacing = this.orientationCheck ? this.isFacingPortal(kirby) : true;
 
-        // Threshold distance and facing check
-        if (distance < 2 && keyState['KeyW'] && isFacing) {
+        // Threshold distance and facing check (ArrowUp should be pressed and Kirby should be facing the portal)
+        if (distance < 2 && keyState['ArrowUp'] && isFacing) {
             kirby.position.set(this.teleportPosition.x, this.teleportPosition.y, this.teleportPosition.z);
             return true; // Teleported
         }
