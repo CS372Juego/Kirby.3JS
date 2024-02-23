@@ -118,15 +118,22 @@ function createKirby() {
 const keyState = {};
 window.addEventListener('keydown', (event) => {
     keyState[event.code] = true;
+    if (event.shiftKey) {
+        kirbySpeed = baseKirbySpeed * 2; // Double the speed
+    } else {
+        kirbySpeed = baseKirbySpeed; // Normal speed
+    }
 });
 
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
+    kirbySpeed = baseKirbySpeed; // Reset speed
 });
 
 
 // Function to handle keyboard input
-const kirbySpeed = 0.2;
+const baseKirbySpeed = 0.1
+let kirbySpeed = baseKirbySpeed;
 let isJumping = false;
 let jumpVelocity = 1;
 const jumpSpeed = 0.25;
