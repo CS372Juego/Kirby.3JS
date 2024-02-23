@@ -9,34 +9,20 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'GLTFLoader';
 import { ColladaLoader } from 'ColladaLoader';
-
-//=====< Colors >=====//
-let Colors = {
-    white: 0xDCF2F1,
-    black: 0x3D3B40,
-    red: 0xFF6868,
-    orange: 0xFFA447,
-    yellow: 0xFAEF9B,
-    green: 0xA1DD70,
-    blue: 0xAEDEFC,
-    pink: 0xFF9EAA,
-};
-
-// Trigger the animation when the page is loaded
-window.onload = function () {
-    init();
-};
+import { Colors } from './color.js';
+import { PortalManager } from './PortalManager.js';
+import { createWorld1, LAND_BEGIN_X, LAND_END_X } from './world1.js';
+import { createWorld2 } from './world2.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
 let kirby;
+let portalManager;
 let targetPosition;
 let isGameRunning = true;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
-let LAND_BEGIN_X;
-let LAND_END_X;
 const LAND_END = -5;
 const loader = new GLTFLoader();
 
@@ -109,20 +95,8 @@ function createLights() {
     scene.add(dirLight);
 }
 
-//=====< Add the world >=====//
-let LAND_LENGTH = 200;
-let LAND_OFFSET = 15;
-LAND_BEGIN_X = -LAND_LENGTH / 2 + LAND_OFFSET;
-LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
-function createWorld() {
-    // Temporary plain
-    let geometry = new THREE.BoxGeometry(LAND_LENGTH, 8, 10);
-    let material = new THREE.MeshPhongMaterial({color: Colors.green});
-    let plain = new THREE.Mesh(geometry, material);
-    plain.position.set(0, 0, 0);
-    scene.add(plain);
-}
 
+//=======< Add Kirby >=====//
 function createKirby() {
     let geometry = new THREE.DodecahedronGeometry(2, 2);
     let material = new THREE.MeshPhongMaterial({color: Colors.pink});
@@ -177,7 +151,7 @@ function handleKeyboardInput() {
         jumpVelocity = jumpSpeed;
     }
 
-    // Apply boundary checks
+    // Boundary checks
     targetPosition.z = Math.min(LAND_BEGIN, Math.max(LAND_END, targetPosition.z));
     targetPosition.x = Math.min(LAND_END_X, Math.max(LAND_BEGIN_X, targetPosition.x));
 }
@@ -187,6 +161,7 @@ function lerp(start, end, t) {
     return start * (1 - t) + end * t;
 }
 
+// Update Kirby's position
 function updateKirbyPosition() {
     kirby.position.x = lerp(kirby.position.x, targetPosition.x, SMOOTHNESS);
     kirby.position.z = lerp(kirby.position.z, targetPosition.z, SMOOTHNESS);
@@ -205,6 +180,17 @@ function updateKirbyPosition() {
     }
 }
 
+//=====< Create Portals >=====//
+function createPortals() {
+    portalManager = new PortalManager(scene);
+    
+    // TO DO: ADD PORTAL POSITIONS
+    portalManager.addPortal(new THREE.Vector3(/* Portal 1 Position */), new THREE.Vector3(/* Destination 1 */));
+    portalManager.addPortal(new THREE.Vector3(/* Portal 2 Position */), new THREE.Vector3(/* Destination 2 */));
+    
+}
+
+//=====< Main Animation Loop >=====//
 function loop() {
     if (!isGameRunning) {
         return;
@@ -212,6 +198,9 @@ function loop() {
     handleKeyboardInput();
     updateKirbyPosition();
     
+    // Uncomment the code below after creating the portal(with positions)
+    // portalManager.checkPortals(kirby, keyState);
+
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
     camera.position.y = lerp(camera.position.y, kirby.position.y + 3, CAMERA_SMOOTHNESS);
     camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
@@ -220,14 +209,21 @@ function loop() {
     renderer.render(scene, camera);
 }
 
+
+//=====< Initialize >=====//
+window.onload = function () {
+    init();
+};
+
 function runScene() {
     createLights();
-    createWorld();
+    createWorld1(scene);
+    // createWorld2(scene);
     createKirby();
+    // createPortals();
     loop();
 }
 
-//=====< Initialize >=====//
 function init(event) {
     createScene();
     runScene();
