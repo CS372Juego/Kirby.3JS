@@ -24,7 +24,8 @@ const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
 const LAND_END = -5;
-const loader = new GLTFLoader();
+const gtlfLoader = new GLTFLoader();
+const colladaLoader = new ColladaLoader();
 
 //=====< Set up the scene >=====//
 function createScene() {
