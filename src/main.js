@@ -24,6 +24,7 @@ const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
 const LAND_END = -5;
+const clock = new THREE.Clock();
 const gtlfLoader = new GLTFLoader();
 const colladaLoader = new ColladaLoader();
 
@@ -35,7 +36,7 @@ function createScene() {
     // Create the scene
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0xFAF1E4, 100, 950);
-    scene.fog.far = 200;
+    // scene.fog.far = 200;
 
     // Create the camera
     fieldOfView = 75;
@@ -48,6 +49,7 @@ function createScene() {
         nearPlane,
         farPlane
     );
+    camera.rotateX(-Math.PI / 8);
 
     // Create the renderer
     renderer = new THREE.WebGLRenderer({
@@ -133,35 +135,35 @@ window.addEventListener('keyup', (event) => {
 
 
 // Function to handle keyboard input
-const baseKirbySpeed = 0.1
+const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
 let isJumping = false;
-let jumpVelocity = 1;
-const jumpSpeed = 0.25;
-const gravity = -0.0025;
+let jumpVelocity = 10;
+const jumpSpeed = 1.75;
+const gravity = -0.15;
 
-function handleKeyboardInput() {
+function handleKeyboardInput(deltaTime) {
     if (!kirby) return;
     if (keyState['KeyW']) {
-        targetPosition.z -= kirbySpeed;
+        targetPosition.z -= kirbySpeed * deltaTime * 100;
     }
     if (keyState['KeyS']) {
-        targetPosition.z += kirbySpeed;
+        targetPosition.z += kirbySpeed * deltaTime * 100;
     }
     if (keyState['KeyA']) {
-        targetPosition.x -= kirbySpeed;
+        targetPosition.x -= kirbySpeed * deltaTime * 100;
     }
     if (keyState['KeyD']) {
-        targetPosition.x += kirbySpeed;
+        targetPosition.x += kirbySpeed * deltaTime * 100;
     }
     if (keyState['Space'] && !isJumping) {
         isJumping = true;
         jumpVelocity = jumpSpeed;
     }
 
-    // Boundary checks
+    // // Boundary checks
     targetPosition.z = Math.min(LAND_BEGIN, Math.max(LAND_END, targetPosition.z));
-    targetPosition.x = Math.min(LAND_END_X, Math.max(LAND_BEGIN_X, targetPosition.x));
+    // targetPosition.x = Math.min(LAND_END_X, Math.max(LAND_BEGIN_X, targetPosition.x));
 }
 
 // Smooth movement (Source: ChatGPT)
@@ -169,21 +171,58 @@ function lerp(start, end, t) {
     return start * (1 - t) + end * t;
 }
 
-// Update Kirby's position
-function updateKirbyPosition() {
-    kirby.position.x = lerp(kirby.position.x, targetPosition.x, SMOOTHNESS);
-    kirby.position.z = lerp(kirby.position.z, targetPosition.z, SMOOTHNESS);
+let raycaster = new THREE.Raycaster();
+let downVector = new THREE.Vector3(0, -1, 0);
+let groundLevel = null;
 
-    // Handle Jumping
+function updateKirbyPosition(deltaTime) {
+    // Determine the direction of movement
+    let movementDirection = new THREE.Vector3(
+        targetPosition.x - kirby.position.x,
+        0,
+        targetPosition.z - kirby.position.z
+    ).normalize();
+
+    // Cast a ray in the direction Kirby is moving to detect walls
+    let wallRaycaster = new THREE.Raycaster(kirby.position, movementDirection, 0, 2);
+    let wallIntersects = wallRaycaster.intersectObjects(scene.children, true); // Check for walls
+
+    let wallDetected = wallIntersects.length > 0;
+
+    if (!wallDetected) {
+        // Update horizontal movement if no wall is detected
+        kirby.position.x = lerp(kirby.position.x, targetPosition.x, SMOOTHNESS);
+        kirby.position.z = lerp(kirby.position.z, targetPosition.z, SMOOTHNESS);
+    }
+
+    // Raycast downwards to find the ground
+    raycaster.set(kirby.position, downVector);
+    let intersects = raycaster.intersectObjects(scene.children, true);
+
+    let distanceToGround = intersects[0].distance;
+    if (intersects.length > 0) {
+        groundLevel = kirby.position.y - distanceToGround + 2;
+    }
+
+    // Handle Jumping and gravity
     if (isJumping) {
-        kirby.position.y += jumpVelocity;
-        jumpVelocity += gravity;
+        kirby.position.y += jumpVelocity * deltaTime * 20;
+        jumpVelocity += gravity * deltaTime * 20;
 
-        // Check if Kirby has landed
-        if (kirby.position.y <= targetPosition.y) {
-            kirby.position.y = targetPosition.y;
+        if (kirby.position.y <= groundLevel) {
+            kirby.position.y = groundLevel;
             isJumping = false;
             jumpVelocity = 0;
+        }
+    } else {
+        // Adjust for ground level changes
+        if (kirby.position.y > groundLevel) {
+            if (distanceToGround > 2)
+                kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
+            else
+                kirby.position.y = groundLevel;
+        } else {
+            kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
         }
     }
 }
@@ -200,21 +239,29 @@ function createPortals() {
 
 //=====< Main Animation Loop >=====//
 function loop() {
+    const deltaTime = clock.getDelta(); 
+
     if (!isGameRunning) {
         return;
     }
-    handleKeyboardInput();
-    updateKirbyPosition();
+
+    // console.log(deltaTime);
+
+    handleKeyboardInput(deltaTime);
+    updateKirbyPosition(deltaTime);
     
     // Uncomment the code below after creating the portal(with positions)
     // portalManager.checkPortals(kirby, keyState);
 
+    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    // camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
+    // camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 3, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
     requestAnimationFrame(loop);
-    renderer.render(scene, camera);
+    renderer.render(scene,camera)
 }
 
 
