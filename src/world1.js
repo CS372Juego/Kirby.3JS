@@ -9,7 +9,7 @@ export const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 // Global variables for reuse
 let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
-const LAND_WIDTH = 10;
+const LAND_WIDTH = 15;
 
 export function createWorld1(scene) {
     let world1 = new THREE.Group();
@@ -24,9 +24,9 @@ export function createWorld1(scene) {
     plain.position.set(LAND_BEGIN_X-LAND_OFFSET-10, 20, 0);
     world1.add(plain);
 
-    geometry = new THREE.BoxGeometry(30, 12, LAND_WIDTH);
+    geometry = new THREE.BoxGeometry(10, 12, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X, 3, 0);
+    plain.position.set(LAND_BEGIN_X+10.1, 3, 0);
     world1.add(plain);
 
     geometry = new THREE.BoxGeometry(20, 5, LAND_WIDTH);
@@ -91,8 +91,6 @@ export function createWorld1(scene) {
     plain = new THREE.Mesh(geometry, material);
     plain.position.set(LAND_END_X+LAND_OFFSET+10, 20, 0);
     world1.add(plain);
-
-    // TO DO: Add more objects to world1
 
     scene.add(world1);
 }
