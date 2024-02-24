@@ -12,7 +12,7 @@ import { ColladaLoader } from 'ColladaLoader';
 import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from './world1.js';
-import { createWorld2 } from './world2.js';
+import { createWorld2, WORLD2_OFFSET_X } from './world2.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
@@ -245,17 +245,18 @@ function loop() {
         return;
     }
 
-    // console.log(deltaTime);
-
     handleKeyboardInput(deltaTime);
     updateKirbyPosition(deltaTime);
     
     // Uncomment the code below after creating the portal(with positions)
     // portalManager.checkPortals(kirby, keyState);
 
+    // Camera for gameplay
     // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
     // camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
     // camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
+
+    // Camera for construction
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
     camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
     camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
@@ -273,7 +274,7 @@ window.onload = function () {
 function runScene() {
     createLights();
     createWorld1(scene);
-    // createWorld2(scene);
+    createWorld2(scene);
     createKirby();
     // createPortals();
     loop();
