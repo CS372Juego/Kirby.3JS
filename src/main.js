@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'GLTFLoader';
 import { ColladaLoader } from 'ColladaLoader';
+import { MMDLoader } from 'MMDLoader';
 import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from './world1.js';
@@ -27,6 +28,7 @@ const LAND_END = -5;
 const clock = new THREE.Clock();
 const gtlfLoader = new GLTFLoader();
 const colladaLoader = new ColladaLoader();
+const mmdLoader = new MMDLoader();
 
 //=====< Set up the scene >=====//
 function createScene() {
