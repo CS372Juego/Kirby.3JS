@@ -104,7 +104,8 @@ function createKirby() {
     let geometry = new THREE.DodecahedronGeometry(2, 2);
     let material = new THREE.MeshPhongMaterial({color: Colors.pink});
     kirby = new THREE.Mesh(geometry, material);
-    kirby.position.set(LAND_BEGIN_X, 6, 0);
+    // kirby.position.set(LAND_BEGIN_X, 7, 0);
+    kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
     kirby.castShadow = true;
     kirby.receiveShadow = true;
     scene.add(kirby);
@@ -179,7 +180,7 @@ function updateKirbyPosition(deltaTime) {
     // Determine the direction of movement
     let movementDirection = new THREE.Vector3(
         targetPosition.x - kirby.position.x,
-        0,
+        0, // Ignore vertical movement for wall detection
         targetPosition.z - kirby.position.z
     ).normalize();
 
@@ -199,9 +200,13 @@ function updateKirbyPosition(deltaTime) {
     raycaster.set(kirby.position, downVector);
     let intersects = raycaster.intersectObjects(scene.children, true);
 
-    let distanceToGround = intersects[0].distance;
+    // Check if intersects found before accessing the distance property
     if (intersects.length > 0) {
-        groundLevel = kirby.position.y - distanceToGround + 2;
+        let distanceToGround = intersects[0].distance;
+        groundLevel = kirby.position.y - distanceToGround + 2; // Adjust for Kirby's height from its bottom
+    } else {
+        // No ground detected, set groundLevel to a default or calculated value
+        groundLevel = -Infinity; // Kirby is over a void
     }
 
     // Handle Jumping and gravity
@@ -209,23 +214,25 @@ function updateKirbyPosition(deltaTime) {
         kirby.position.y += jumpVelocity * deltaTime * 20;
         jumpVelocity += gravity * deltaTime * 20;
 
-        if (kirby.position.y <= groundLevel) {
-            kirby.position.y = groundLevel;
-            isJumping = false;
-            jumpVelocity = 0;
+        // Implement logic when Kirby is above the void
+        if (kirby.position.y <= groundLevel || groundLevel === -Infinity) {
+            if (groundLevel !== -Infinity) {
+                kirby.position.y = groundLevel;
+                isJumping = false;
+                jumpVelocity = 0;
+            }
         }
     } else {
         // Adjust for ground level changes
-        if (kirby.position.y > groundLevel) {
-            if (distanceToGround > 2)
-                kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
-            else
-                kirby.position.y = groundLevel;
-        } else {
+        if (kirby.position.y > groundLevel && groundLevel !== -Infinity) {
             kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
+        } else if (groundLevel === -Infinity) {
+            // Apply gravity if Kirby is over a void
+            kirby.position.y += gravity * deltaTime * 20;
         }
     }
 }
+
 
 //=====< Create Portals >=====//
 function createPortals() {
