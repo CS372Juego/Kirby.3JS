@@ -65,7 +65,7 @@ var modelAClone = new QuaterniusModel();
   try {
     // New methods
     await modelA.load('/public/Mech.glb', Math.PI/2);
-    modelA.cueAnimation(0, true);
+    modelA.cueAnimation(0, true, 0);
 
     // Inherits THREE.Object3D() methods
     modelA.scale.set(2, 2, 2);
@@ -78,7 +78,7 @@ var modelAClone = new QuaterniusModel();
     
     // Make more of the same model without loading again
     modelAClone = modelA.clone();
-    modelAClone.cueAnimation(0, true);
+    modelAClone.cueAnimation(0, true, 0);
     modelAClone.position.set(0, 0, 0);
     scene.add(modelAClone);
     
@@ -92,7 +92,7 @@ const modelB = new QuaterniusModel();
 (async () => {
   try {
     await modelB.load('/public/Astronaut.glb', Math.PI/2);
-    modelB.cueAnimation(10, true);
+    modelB.cueAnimation(10, true, 0);
 
     modelB.position.set(0, 0, 5);
     scene.add(modelB);
