@@ -130,10 +130,10 @@ function animate() {
   }
   if (keyState['KeyQ']) {
     // Example: resuming an animation after interrupting with another animation
-    var prior_animation = modelB.currentAnimation;
-    if(prior_animation != 9) {
+    var priorAnimation = modelB.currentAnimation;
+    if(priorAnimation != 9 && priorAnimation != 0) {
       modelB.cueAnimation(9, false, 0.1);
-      modelB.cueAnimation(prior_animation, true, 1);
+      modelB.cueAnimation(priorAnimation, true, 1);
     }
   }
   if (keyState['KeyK']) {
