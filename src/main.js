@@ -109,9 +109,9 @@ function createKirby() {
     let material = new THREE.MeshPhongMaterial({color: Colors.pink});
     kirby = new THREE.Mesh(geometry, material);
 
-    // kirby.position.set(LAND_BEGIN_X, 7, 0);
+    kirby.position.set(LAND_BEGIN_X, 7, 0);
     // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-    kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+    // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
     kirby.castShadow = true;
     kirby.receiveShadow = true;

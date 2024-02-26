@@ -8,6 +8,7 @@ let Colors = {
     green: 0xA1DD70,
     blue: 0xAEDEFC,
     pink: 0xFF9EAA,
+    brown: 0x8B4513,
 };
 
 export { Colors };
