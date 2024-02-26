@@ -34,6 +34,60 @@ export function createWorldF(scene) {
 
     world2.position.x = WORLDF_OFFSET_X;
     scene.add(world2);
+
+    //=====< Trees >=====//
+    let tree = new Tree();
+    tree.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 5, 10, -5);
+    tree.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(tree.mesh);
+
+    tree = new Tree();
+    tree.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 65, 10, -5);
+    tree.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(tree.mesh);
+}
+
+// Temporary tree from project5..
+// To be replaced with a model
+let Tree = function() {
+    this.mesh = new THREE.Object3D();
+
+    // Create leaves
+    let geoLeaves = new THREE.DodecahedronGeometry(25, 1);
+    let matLeaves = new THREE.MeshPhongMaterial({
+        color: Colors.green,
+        flatShading: true
+    });
+
+    // Create trunk
+    let geoTrunk = new THREE.CylinderGeometry(3, 4, 50, 5);
+    let matTrunk = new THREE.MeshPhongMaterial({
+        color: Colors.brown
+    });
+
+    let numLeaves = 5;
+    let leaveSizes = [0.8, 0.38, 0.2, 0.5, 0.4];
+    let leavePos = [[0, 30, 0], [12, 23, 8], [0, 25, 16], [-15, 33, -5], [-16, 24, 10]];
+    for (let i=0; i < numLeaves; i++) {
+        let leaves = new THREE.Mesh(geoLeaves, matLeaves);
+        leaves.position.set(leavePos[i][0], leavePos[i][1], leavePos[i][2]);
+        
+        let scale = leaveSizes[i];
+        leaves.scale.set(scale, scale, scale);
+        
+        // Random rotation
+        leaves.rotation.x = Math.random() * Math.PI * 2;
+        leaves.rotation.y = Math.random() * Math.PI * 2;
+
+        leaves.castShadow = true;
+        leaves.receiveShadow = true;
+        this.mesh.add(leaves);
+    }
+
+    this.trunk = new THREE.Mesh(geoTrunk, matTrunk);
+    this.trunk.castShadow = true;
+    this.trunk.receiveShadow = true;
+    this.mesh.add(this.trunk);
 }
 
 export function removeWorldF(scene) {

@@ -108,9 +108,11 @@ function createKirby() {
     let geometry = new THREE.DodecahedronGeometry(KIRBY_SIZE, KIRBY_SIZE);
     let material = new THREE.MeshPhongMaterial({color: Colors.pink});
     kirby = new THREE.Mesh(geometry, material);
+
     // kirby.position.set(LAND_BEGIN_X, 7, 0);
-    kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-    // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+    // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
+    kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+
     kirby.castShadow = true;
     kirby.receiveShadow = true;
     scene.add(kirby);
@@ -167,7 +169,7 @@ function handleKeyboardInput(deltaTime) {
         jumpVelocity = jumpSpeed;
     }
 
-    // // Boundary checks
+    // Boundary checks
     targetPosition.z = Math.min(LAND_BEGIN, Math.max(LAND_END, targetPosition.z));
     // targetPosition.x = Math.min(LAND_END_X, Math.max(LAND_BEGIN_X, targetPosition.x));
 }
@@ -222,7 +224,6 @@ function updateKirbyPosition(deltaTime) {
         let distanceToGround = intersects[0].distance;
         groundLevel = kirby.position.y - distanceToGround + KIRBY_SIZE;
     } else {
-        // No ground detected
         groundLevel = -Infinity; // Kirby is over a void
     }
 
