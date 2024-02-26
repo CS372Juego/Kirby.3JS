@@ -284,9 +284,9 @@ function loop() {
     // portalManager.checkPortals(kirby, keyState);
 
     // Camera for gameplay
-    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    // camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
-    // camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
+    camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
 
     // Camera for construction
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree } from '../src/structure.js';
+import { Tree, Spikes } from '../src/structure.js';
 
 export const LAND_LENGTH = 300;
 export const LAND_OFFSET = 15;
@@ -115,6 +115,32 @@ export function createWorld1(scene) {
     tree.mesh.position.set(LAND_BEGIN_X + 265, 9, -5);
     tree.mesh.scale.set(0.3, 0.3, 0.3);
     scene.add(tree.mesh);
+
+    //=====< Spikes >=====//
+    let spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 60.5, 6, 0);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
+    spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 66.5, 6, 0);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
+    spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 60.5, 6, -5);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
+    spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 66.5, 6, -5);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
+    spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 60.5, 6, 5);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
+    spikes = new Spikes();
+    spikes.mesh.position.set(LAND_BEGIN_X + 66.5, 6, 5);
+    spikes.mesh.scale.set(0.3, 0.3, 0.3);
+    scene.add(spikes.mesh);
 }
 
 export function removeWorld1(scene) {

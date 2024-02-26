@@ -45,3 +45,26 @@ export class Tree {
         this.mesh.add(this.trunk);
     }
 }
+
+// Temporary spikes..
+// To be replaced with a model
+export class Spikes {
+    constructor() {
+        this.mesh = new THREE.Object3D();
+        let geoSpike = new THREE.ConeGeometry(2, 10, 10);
+        let matSpike = new THREE.MeshPhongMaterial({
+            color: Colors.white,
+        });
+
+        let numSpikes = 5;
+        let spikePos = [[0, 0, 0], [5, 0, 5], [-5, 0, -5], [5, 0, -5], [-5, 0, 5]];
+        for (let i = 0; i < numSpikes; i++) {
+            let spike = new THREE.Mesh(geoSpike, matSpike);
+            spike.position.set(...spikePos[i]);
+            spike.castShadow = true;
+            spike.receiveShadow = true;
+            this.mesh.add(spike);
+        }
+    }
+}
+
