@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Colors } from './color.js';
+import { Colors } from '../src/color.js';
 
 const LAND_WIDTH = 20;
 export const WORLDF_OFFSET_X = 600;

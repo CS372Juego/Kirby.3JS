@@ -12,9 +12,9 @@ import { ColladaLoader } from 'ColladaLoader';
 import { MMDLoader } from 'MMDLoader';
 import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
-import { createWorld1, LAND_BEGIN_X, LAND_END_X } from './world1.js';
-import { createWorld2, WORLD2_OFFSET_X } from './world2.js';
-import { createWorldF, WORLDF_OFFSET_X } from './finalworld.js';
+import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
+import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
+import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
