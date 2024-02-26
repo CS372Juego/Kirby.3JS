@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Colors } from './color.js';
 
-const LAND_WIDTH = 15;
+const LAND_WIDTH = 20;
 export const WORLD2_OFFSET_X = 350;
 
 const LAND_LENGTH = 300;
@@ -27,50 +27,90 @@ export function createWorld2(scene) {
     plain.position.set(LAND_BEGIN_X-LAND_OFFSET-10, 20, 0);
     world2.add(plain);
 
-    geometry = new THREE.BoxGeometry(10, 12, LAND_WIDTH);
+    geometry = new THREE.BoxGeometry(10, 20, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X+10.1, 3, 0);
+    plain.position.set(LAND_BEGIN_X + 30, 5, 0);
     world2.add(plain);
 
-    geometry = new THREE.BoxGeometry(20, 5, LAND_WIDTH);
+    geometry = new THREE.BoxGeometry(20, 60, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 23.5, 3, 0);
-    plain.rotation.z = -Math.PI / 8;
-    world2.add(plain);
-
-    geometry = new THREE.BoxGeometry(5, 10, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 50, 5, 0);
-    world2.add(plain);
-
-    geometry = new THREE.BoxGeometry(5, 20, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 54.9, 5, 0);
-    world2.add(plain);
-
-    geometry = new THREE.BoxGeometry(20, 20, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 80, 5, 0);
+    plain.position.set(LAND_BEGIN_X + 65, 40, 0);
     world2.add(plain);
 
     geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 110, 14, 0);
+    plain.position.set(LAND_BEGIN_X + 90, 14, 0);
     world2.add(plain);
 
     geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 130, 14, 0);
+    plain.position.set(LAND_BEGIN_X + 80, 24, 0);
     world2.add(plain);
 
     geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 150, 14, 0);
+    plain.position.set(LAND_BEGIN_X + 90, 34, 0);
     world2.add(plain);
 
-    geometry = new THREE.BoxGeometry(20, 20, LAND_WIDTH);
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
     plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 180, 5, 0);
+    plain.position.set(LAND_BEGIN_X + 80, 44, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 90, 54, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 120, 70, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(50, 60, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 120, 30, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 165, 54, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 150, 44, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 165, 34, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 150, 24, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(10, 15, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 150, 10, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(20, 50, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 180, 45, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(30, 10, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 170, 7, 0);
+    world2.add(plain);
+
+    geometry = new THREE.BoxGeometry(20, 10, LAND_WIDTH);
+    plain = new THREE.Mesh(geometry, material);
+    plain.position.set(LAND_BEGIN_X + 182, 6.4, 0);
+    plain.rotation.z = Math.PI / 8;
     world2.add(plain);
 
     geometry = new THREE.BoxGeometry(20, 10, LAND_WIDTH);

@@ -9,7 +9,7 @@ export const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 // Global variables for reuse
 let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
-const LAND_WIDTH = 15;
+const LAND_WIDTH = 20;
 
 export function createWorld1(scene) {
     let world1 = new THREE.Group();
