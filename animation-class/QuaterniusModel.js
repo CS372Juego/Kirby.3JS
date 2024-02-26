@@ -2,10 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
-// TODO: animation smoothing
-// TODO: verify bounding box
-// TODO: clone method
-
 /** @class QuaterniusModel encapsulates a GLB model and its animations, along
  * with operations to offset its rotation and dynamically compute its bounding
  * box. */
