@@ -14,6 +14,7 @@ import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from './world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from './world2.js';
+import { createWorldF, WORLDF_OFFSET_X } from './finalworld.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
@@ -21,6 +22,7 @@ let kirby;
 let portalManager;
 let targetPosition;
 let isGameRunning = true;
+const KIRBY_SIZE = 2;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
@@ -103,11 +105,12 @@ function createLights() {
 
 //=======< Add Kirby >=====//
 function createKirby() {
-    let geometry = new THREE.DodecahedronGeometry(2, 2);
+    let geometry = new THREE.DodecahedronGeometry(KIRBY_SIZE, KIRBY_SIZE);
     let material = new THREE.MeshPhongMaterial({color: Colors.pink});
     kirby = new THREE.Mesh(geometry, material);
     // kirby.position.set(LAND_BEGIN_X, 7, 0);
     kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
+    // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
     kirby.castShadow = true;
     kirby.receiveShadow = true;
     scene.add(kirby);
@@ -186,8 +189,20 @@ function updateKirbyPosition(deltaTime) {
         targetPosition.z - kirby.position.z
     ).normalize();
 
+    // Cast a ray upwards from Kirby's position to detect ceilings
+    let ceilingRaycaster = new THREE.Raycaster(kirby.position, new THREE.Vector3(0, 1, 0), 0, 10);
+    let ceilingIntersects = ceilingRaycaster.intersectObjects(scene.children, true);
+
+    let ceilingDetected = ceilingIntersects.length > 0;
+    let ceilingLevel = null;
+
+    if (ceilingDetected) {
+        let distanceToCeiling = ceilingIntersects[0].distance;
+        ceilingLevel = kirby.position.y + distanceToCeiling - KIRBY_SIZE;
+    }
+
     // Cast a ray in the direction Kirby is moving to detect walls
-    let wallRaycaster = new THREE.Raycaster(kirby.position, movementDirection, 0, 2);
+    let wallRaycaster = new THREE.Raycaster(kirby.position, movementDirection, 0, KIRBY_SIZE);
     let wallIntersects = wallRaycaster.intersectObjects(scene.children, true); // Check for walls
 
     let wallDetected = wallIntersects.length > 0;
@@ -205,9 +220,9 @@ function updateKirbyPosition(deltaTime) {
     // Check if intersects found before accessing the distance property
     if (intersects.length > 0) {
         let distanceToGround = intersects[0].distance;
-        groundLevel = kirby.position.y - distanceToGround + 2; // Adjust for Kirby's height from its bottom
+        groundLevel = kirby.position.y - distanceToGround + KIRBY_SIZE;
     } else {
-        // No ground detected, set groundLevel to a default or calculated value
+        // No ground detected
         groundLevel = -Infinity; // Kirby is over a void
     }
 
@@ -224,14 +239,21 @@ function updateKirbyPosition(deltaTime) {
                 jumpVelocity = 0;
             }
         }
+        if (ceilingDetected && kirby.position.y >= ceilingLevel) {
+            kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
+            jumpVelocity = 0; // Stop upward movement
+        }
     } else {
         // Adjust for ground level changes
         if (kirby.position.y > groundLevel && groundLevel !== -Infinity) {
             kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
+        } else if (kirby.position.y < groundLevel) {
+            // Kirby can climb up slopes
+            kirby.position.y = groundLevel;
         } else if (groundLevel === -Infinity) {
             // Apply gravity if Kirby is over a void
             kirby.position.y += gravity * deltaTime * 20;
-        }
+        } 
     }
 }
 
@@ -284,6 +306,7 @@ function runScene() {
     createLights();
     createWorld1(scene);
     createWorld2(scene);
+    createWorldF(scene);
     createKirby();
     // createPortals();
     loop();
