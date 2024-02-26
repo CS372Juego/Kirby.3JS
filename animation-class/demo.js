@@ -6,7 +6,7 @@
  * Controls:
  * - WASD to rotate astronaut
  * - P to stop animation (set with a 1sec (editable) transition to base pose)
- * - N for melee attack animation
+ * - Q for melee attack animation
  * - K for death animation
  * - R for run animation
  * - SPACE bar for run and gun animation
