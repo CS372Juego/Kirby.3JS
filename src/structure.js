@@ -68,3 +68,18 @@ export class Spikes {
     }
 }
 
+// Temporary Star Boxes//
+// To be replaced with a model
+export class StarBox {
+    constructor() {
+        this.mesh = new THREE.Object3D();
+        let geoBox = new THREE.BoxGeometry(5, 5, 5);
+        let matBox = new THREE.MeshPhongMaterial({
+            color: Colors.yellow,
+        });
+        
+        let starBox = new THREE.Mesh(geoBox, matBox);
+        this.mesh.add(starBox);
+    }
+}
+

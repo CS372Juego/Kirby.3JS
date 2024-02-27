@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree, Spikes } from '../src/structure.js';
+import { Tree, Spikes, StarBox } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLD2_OFFSET_X = 350;
@@ -202,6 +202,23 @@ export function createWorld2(scene) {
     spikes.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 122.5, 61, 5);
     spikes.mesh.scale.set(0.3, 0.3, 0.3);
     scene.add(spikes.mesh);
+
+    //=====< Star Box >=====//
+    let starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 22.5, 7.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 22.5, 7.5, 5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 210.5, 12.5, 5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 210.5, 12.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 272.5, 7.5, -5);
+    scene.add(starBox.mesh);
 }
 
 export function removeWorld2(scene) {

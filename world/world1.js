@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree, Spikes } from '../src/structure.js';
+import { Tree, Spikes, StarBox } from '../src/structure.js';
 
 export const LAND_LENGTH = 300;
 export const LAND_OFFSET = 15;
@@ -141,6 +141,60 @@ export function createWorld1(scene) {
     spikes.mesh.position.set(LAND_BEGIN_X + 66.5, 6, 5);
     spikes.mesh.scale.set(0.3, 0.3, 0.3);
     scene.add(spikes.mesh);
+
+    //=====< Star Box >=====//
+    let starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 92.5, 7.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 92.5, 7.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 92.5, 7.5, 5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 120.5, 7.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 120.5, 7.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 120.5, 7.5, 5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 167.5, 7.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 167.5, 7.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 167.5, 7.5, 5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 12.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 12.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 17.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 17.5, -5);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 12.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 12.5, 0);
+    scene.add(starBox.mesh);
+    starBox = new StarBox();
+    starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, 0);
+    scene.add(starBox.mesh);
 }
 
 export function removeWorld1(scene) {
