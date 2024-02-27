@@ -166,8 +166,10 @@ window.addEventListener('keyup', (event) => {
         kirbyModel.cueAnimation(2, true, 0.3);
     }
     // Stop animation and reset to idle
-    kirbyModel.stopAnimation(0.3);
-    kirbyModel.cueAnimation(0, true, 0.3);
+    if(kirbyModel.currentAnimation != 0) {
+        kirbyModel.stopAnimation(0.3);
+        kirbyModel.cueAnimation(0, true, 0.3);
+    }
 });
 
 
