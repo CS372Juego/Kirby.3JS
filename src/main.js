@@ -163,11 +163,11 @@ window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
     kirbySpeed = baseKirbySpeed; // Reset speed
     if (event.shiftKey) {
-        kirbyModel.cueAnimation(2, true, 0);
+        kirbyModel.cueAnimation(2, true, 0.4);
     }
     // Stop animation and reset to idle
-    kirbyModel.stopAnimation(0.3);
-    kirbyModel.cueAnimation(0, true, 0);
+    kirbyModel.stopAnimation(0.4);
+    kirbyModel.cueAnimation(0, true, 0.4);
 });
 
 
@@ -184,22 +184,30 @@ function handleKeyboardInput(deltaTime, direction) {
     if (keyState['KeyW']) {
         targetPosition.z -= kirbySpeed * deltaTime * 100;
         direction.z -= baseKirbySpeed;
-        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
+        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+            kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
+        }
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
         direction.z += baseKirbySpeed;
-        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
+        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+            kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
+        }
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
         direction.x -= baseKirbySpeed;
-        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
+        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+            kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
+        }
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
         direction.x += baseKirbySpeed;
-        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
+        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+            kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
+        }
     }
     if (keyState['Space'] && !isJumping) {
         kirbyModel.cueAnimation(0, false, 0.3);
