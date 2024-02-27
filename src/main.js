@@ -12,17 +12,19 @@ import { ColladaLoader } from 'ColladaLoader';
 import { MMDLoader } from 'MMDLoader';
 import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
+import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
-let kirby;
+let kirby, kirbyModel;
 let portalManager;
 let targetPosition;
 let isGameRunning = true;
-const KIRBY_SIZE = 2;
+let walkingAnimationIndex = 2;
+const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
@@ -104,25 +106,44 @@ function createLights() {
 
 
 //=======< Add Kirby >=====//
-function createKirby() {
-    let geometry = new THREE.DodecahedronGeometry(KIRBY_SIZE, KIRBY_SIZE);
-    let material = new THREE.MeshPhongMaterial({color: Colors.pink});
-    kirby = new THREE.Mesh(geometry, material);
+async function createKirby() {
+    try {
+        // let geometry = new THREE.DodecahedronGeometry(KIRBY_SIZE, KIRBY_SIZE);
+        let geometry = new THREE.SphereGeometry(KIRBY_SIZE, 32, 32);
+        let material = new THREE.MeshPhongMaterial( {visible: false} ); // Set visible to true
+        kirby = new THREE.Mesh(geometry, material);
 
-    kirby.position.set(LAND_BEGIN_X, 7, 0);
-    // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-    // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+        kirby.position.set(LAND_BEGIN_X, 7, 0);
+        // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
+        // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
-    kirby.castShadow = true;
-    kirby.receiveShadow = true;
-    scene.add(kirby);
+        scene.add(kirby);
 
-    // Initialize targetPosition here
-    targetPosition = {
-        x: kirby.position.x,
-        y: kirby.position.y,
-        z: kirby.position.z,
-    };
+        // Initialize targetPosition here
+        targetPosition = {
+            x: kirby.position.x,
+            y: kirby.position.y,
+            z: kirby.position.z,
+        };
+
+        kirbyModel = new QuaterniusModel();
+        // New methods
+        await kirbyModel.load('../assets/model/kirby.glb', Math.PI/2);
+        kirbyModel.cueAnimation(0, true, 0);
+
+        // Inherits THREE.Object3D() methods
+        kirbyModel.scale.set(0.03, 0.03, 0.03);
+
+        kirbyModel.traverse((child) => {
+            if (child.isMesh) {
+                child.raycast = function () {};
+            }
+        });
+
+        kirby.add(kirbyModel);
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
 }
 
 //=====< Add Keyboard Interaction >=====//
@@ -131,14 +152,22 @@ window.addEventListener('keydown', (event) => {
     keyState[event.code] = true;
     if (event.shiftKey) {
         kirbySpeed = baseKirbySpeed * 2; // Double the speed
+        walkingAnimationIndex = 1;
     } else {
         kirbySpeed = baseKirbySpeed; // Normal speed
+        walkingAnimationIndex = 2;
     }
 });
 
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
     kirbySpeed = baseKirbySpeed; // Reset speed
+    if (event.shiftKey) {
+        kirbyModel.cueAnimation(2, true, 0);
+    }
+    // Stop animation and reset to idle
+    kirbyModel.stopAnimation(0.3);
+    kirbyModel.cueAnimation(0, true, 0);
 });
 
 
@@ -150,21 +179,30 @@ let jumpVelocity = 10;
 const jumpSpeed = 1.75;
 const gravity = -0.15;
 
-function handleKeyboardInput(deltaTime) {
+function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
         targetPosition.z -= kirbySpeed * deltaTime * 100;
+        direction.z -= baseKirbySpeed;
+        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
+        direction.z += baseKirbySpeed;
+        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
+        direction.x -= baseKirbySpeed;
+        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
+        direction.x += baseKirbySpeed;
+        kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['Space'] && !isJumping) {
+        kirbyModel.cueAnimation(0, false, 0.3);
         isJumping = true;
         jumpVelocity = jumpSpeed;
     }
@@ -178,7 +216,6 @@ function lerp(start, end, t) {
     return start * (1 - t) + end * t;
 }
 
-let raycaster = new THREE.Raycaster();
 let downVector = new THREE.Vector3(0, -1, 0);
 let groundLevel = null;
 
@@ -215,8 +252,8 @@ function updateKirbyPosition(deltaTime) {
     }
 
     // Raycast downwards to find the ground
-    raycaster.set(kirby.position, downVector);
-    let intersects = raycaster.intersectObjects(scene.children, true);
+    let groundRaycaster = new THREE.Raycaster(kirby.position, downVector);
+    let intersects = groundRaycaster.intersectObjects(scene.children, true);
 
     // Check if intersects found before accessing the distance property
     if (intersects.length > 0) {
@@ -276,24 +313,41 @@ function loop() {
         return;
     }
 
-    handleKeyboardInput(deltaTime);
+    let direction = {
+        x: 0,
+        z: 0,
+    }
+
+    handleKeyboardInput(deltaTime, direction);
     updateKirbyPosition(deltaTime);
+
+    kirbyModel.advanceAnimation(deltaTime);
+    alignRotation(kirbyModel, direction);
     
     // Uncomment the code below after creating the portal(with positions)
     // portalManager.checkPortals(kirby, keyState);
 
     // Camera for gameplay
-    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    // camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
-    // camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
+    camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
 
     // Camera for construction
-    camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
+    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    // camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
+    // camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
     requestAnimationFrame(loop);
     renderer.render(scene,camera)
+}
+
+function alignRotation(obj, vel) {
+    if(vel.x != 0 || vel.z != 0) {
+        const targetAngle = -Math.atan2(vel.z, vel.x);
+        var targetRotation = new THREE.Quaternion();
+        targetRotation.setFromEuler(new THREE.Euler(0, targetAngle, 0));
+        obj.quaternion.rotateTowards(targetRotation, 0.1);
+    }
 }
 
 
