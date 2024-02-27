@@ -183,22 +183,22 @@ function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
         targetPosition.z -= kirbySpeed * deltaTime * 100;
-        direction.z -= baseKirbySpeed;
+        direction.z -= baseKirbySpeed * deltaTime * 200;
         kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
-        direction.z += baseKirbySpeed;
+        direction.z += baseKirbySpeed * deltaTime * 200;
         kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
-        direction.x -= baseKirbySpeed;
+        direction.x -= baseKirbySpeed * deltaTime * 200;
         kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
-        direction.x += baseKirbySpeed;
+        direction.x += baseKirbySpeed * deltaTime * 200;
         kirbyModel.cueAnimation(walkingAnimationIndex, true, 0);
     }
     if (keyState['Space'] && !isJumping) {
