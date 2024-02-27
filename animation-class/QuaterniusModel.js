@@ -11,7 +11,7 @@ export class QuaterniusModel extends THREE.Object3D {
   #loadingComplete;
   #animationData;
   #modelData;
-  currentAnimation = undefined;
+  lastAnimation = undefined;
 
   /**
    * Instantiates a QuaterniusModel. Inherits from THREE's Object3D().
@@ -76,7 +76,7 @@ export class QuaterniusModel extends THREE.Object3D {
    */
   cueAnimation(index, loop, transitionTime) {
     if(this.animations.length - 1 >= index) {
-      if(this.currentAnimation != index) {
+      if(this.lastAnimation != index) {
         this.stopAnimation(transitionTime);
       }
       const animation = this.animations[index];
@@ -92,7 +92,7 @@ export class QuaterniusModel extends THREE.Object3D {
       }
       animation.play();
       animation.fadeIn(transitionTime);
-      this.currentAnimation = index;
+      this.lastAnimation = index;
     }
   }
 
@@ -100,9 +100,9 @@ export class QuaterniusModel extends THREE.Object3D {
    * Stop the current animation.
    */
   stopAnimation(transitionTime) {
-    if(this.animations.length > 0 && this.currentAnimation !== undefined) {
-      this.animations[this.currentAnimation].fadeOut(transitionTime);
-      this.currentAnimation = undefined;
+    if(this.animations.length > 0 && this.lastAnimation !== undefined) {
+      this.animations[this.lastAnimation].fadeOut(transitionTime);
+      this.lastAnimation = undefined;
     }
   }
 

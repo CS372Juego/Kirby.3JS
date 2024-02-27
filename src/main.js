@@ -163,11 +163,13 @@ window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
     kirbySpeed = baseKirbySpeed; // Reset speed
     if (event.shiftKey) {
-        kirbyModel.cueAnimation(2, true, 0);
+        kirbyModel.cueAnimation(2, true, 0.3);
     }
     // Stop animation and reset to idle
-    kirbyModel.stopAnimation(0.3);
-    kirbyModel.cueAnimation(0, true, 0);
+    if(kirbyModel.lastAnimation != 0) {
+        kirbyModel.stopAnimation(0.3);
+        kirbyModel.cueAnimation(0, true, 0.3);
+    }
 });
 
 

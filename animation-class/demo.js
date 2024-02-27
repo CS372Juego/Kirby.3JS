@@ -65,8 +65,8 @@ var modelAClone = new QuaterniusModel();
 (async () => {
   try {
     // New methods
-    await modelA.load('/animation-class/public/Mech.glb', Math.PI/2);
-    // await modelA.load('/public/Mech.glb', Math.PI/2);
+    // await modelA.load('/animation-class/public/Mech.glb', Math.PI/2);
+    await modelA.load('/public/Mech.glb', Math.PI/2);
     modelA.cueAnimation(0, true, 0);
 
     // Inherits THREE.Object3D() methods
@@ -93,8 +93,8 @@ var modelAClone = new QuaterniusModel();
 const modelB = new QuaterniusModel();
 (async () => {
   try {
-    await modelB.load('/animation-class/public/Astronaut.glb', Math.PI/2);
-    // await modelB.load('/public/Astronaut.glb', Math.PI/2);
+    // await modelB.load('/animation-class/public/Astronaut.glb', Math.PI/2);
+    await modelB.load('/public/Astronaut.glb', Math.PI/2);
     modelB.cueAnimation(10, true, 0);
 
     modelB.position.set(0, 0, 5);
@@ -133,7 +133,7 @@ function animate() {
   }
   if (keyState['KeyQ']) {
     // Example: resuming an animation after interrupting with another animation
-    var priorAnimation = modelB.currentAnimation;
+    var priorAnimation = modelB.lastAnimation;
     modelB.cueAnimation(9, false, 0.1);
     if(priorAnimation != 9 && priorAnimation != 0) {
       modelB.cueAnimation(priorAnimation, true, 1);
