@@ -166,7 +166,7 @@ window.addEventListener('keyup', (event) => {
         kirbyModel.cueAnimation(2, true, 0.3);
     }
     // Stop animation and reset to idle
-    if(kirbyModel.currentAnimation != 0) {
+    if(kirbyModel.lastAnimation != 0) {
         kirbyModel.stopAnimation(0.3);
         kirbyModel.cueAnimation(0, true, 0.3);
     }
@@ -186,33 +186,36 @@ function handleKeyboardInput(deltaTime, direction) {
     if (keyState['KeyW']) {
         targetPosition.z -= kirbySpeed * deltaTime * 100;
         direction.z -= baseKirbySpeed;
-        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+        if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
         direction.z += baseKirbySpeed;
-        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+        if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
         direction.x -= baseKirbySpeed;
-        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+        if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
         direction.x += baseKirbySpeed;
-        if(kirbyModel.currentAnimation != walkingAnimationIndex) {
+        if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
     }
     if (keyState['Space'] && !isJumping) {
-        kirbyModel.cueAnimation(0, false, 0.3);
+        // I don't believe this has any noticeable effect and it causes the
+        // idle animation to not loop if you just jump without moving, so I
+        // have commented it out for now. 
+        // kirbyModel.cueAnimation(0, false, 0.3);
         isJumping = true;
         jumpVelocity = jumpSpeed;
     }
