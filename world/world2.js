@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree, Spikes, StarBox } from '../src/structure.js';
+import { Tree, Spikes, StarBox, loadTreeModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLD2_OFFSET_X = 350;
@@ -15,7 +15,7 @@ let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
 
 
-export function createWorld2(scene) {
+export async function createWorld2(scene) {
     let world2 = new THREE.Group();
 
     geometry = new THREE.BoxGeometry(LAND_LENGTH, 10, LAND_WIDTH);
@@ -140,42 +140,33 @@ export function createWorld2(scene) {
     scene.add(world2);
 
     //=====< Trees >=====//
-    let tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 5, 10, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    const sharedTreeModel = await loadTreeModel();
+    const treePositions = [
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 5, y: 10, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 30, y: 23, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 58, y: 75, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 72, y: 75, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 172, y: 75, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 188, y: 75, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 250, y: 9, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 265, y: 9, z: -5},
+    ];
 
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 30, 23, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 58, 75, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 72, 75, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 172, 75, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 188, 75, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 250, 9, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 265, 9, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    treePositions.forEach(position => {
+        let treeModel = sharedTreeModel.clone();
+        treeModel.scale.set(20, 20, 20);
+        treeModel.traverse((child) => {
+            if (child.isMesh) {
+                child.raycast = function () {};
+            }
+        });
+        treeModel.position.set(0, -18, 0);
+        let tree = new Tree();
+        tree.mesh.position.set(position.x, position.y, position.z);
+        tree.mesh.scale.set(0.3, 0.3, 0.3);
+        scene.add(tree.mesh);
+        tree.mesh.add(treeModel);
+    });
 
     //=====< Spikes >=====//
     let spikes = new Spikes();

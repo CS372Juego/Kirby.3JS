@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree, Spikes, StarBox } from '../src/structure.js';
+import { Tree, Spikes, StarBox, loadTreeModel } from '../src/structure.js';
 
 export const LAND_LENGTH = 300;
 export const LAND_OFFSET = 15;
@@ -12,7 +12,7 @@ let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
 const LAND_WIDTH = 20;
 
-export function createWorld1(scene) {
+export async function createWorld1(scene) {
     let world1 = new THREE.Group();
 
     //=====< Level Structure >=====//
@@ -97,24 +97,29 @@ export function createWorld1(scene) {
     scene.add(world1);
 
     //=====< Trees >=====//
-    let tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + 10, 15, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    const sharedTreeModel = await loadTreeModel();
+    const treePositions = [
+        {x: LAND_BEGIN_X + 10, y: 15, z: -5},
+        {x: LAND_BEGIN_X + 180, y: 20, z: -5},
+        {x: LAND_BEGIN_X + 250, y: 9, z: -5},
+        {x: LAND_BEGIN_X + 265, y: 9, z: -5},
+    ];
 
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + 180, 20, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + 250, 9, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + 265, 9, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    treePositions.forEach(position => {
+        let treeModel = sharedTreeModel.clone();
+        treeModel.scale.set(20, 20, 20);
+        treeModel.traverse((child) => {
+            if (child.isMesh) {
+                child.raycast = function () {};
+            }
+        });
+        treeModel.position.set(0, -18, 0);
+        let tree = new Tree();
+        tree.mesh.position.set(position.x, position.y, position.z);
+        tree.mesh.scale.set(0.3, 0.3, 0.3);
+        scene.add(tree.mesh);
+        tree.mesh.add(treeModel);
+    });
 
     //=====< Spikes >=====//
     let spikes = new Spikes();

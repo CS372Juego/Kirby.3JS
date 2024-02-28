@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree } from '../src/structure.js';
+import { Tree, loadTreeModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLDF_OFFSET_X = 580;
@@ -15,7 +15,7 @@ let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
 
 
-export function createWorldF(scene) {
+export async function createWorldF(scene) {
     let world2 = new THREE.Group();
 
     geometry = new THREE.BoxGeometry(LAND_LENGTH, 10, LAND_WIDTH);
@@ -37,15 +37,27 @@ export function createWorldF(scene) {
     scene.add(world2);
 
     //=====< Trees >=====//
-    let tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 5, 10, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    const sharedTreeModel = await loadTreeModel();
+    const treePositions = [
+        {x: LAND_BEGIN_X + WORLDF_OFFSET_X + 5, y: 10, z: -5},
+        {x: LAND_BEGIN_X + WORLDF_OFFSET_X + 65, y: 10, z: -5},
+    ];
 
-    tree = new Tree();
-    tree.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 65, 10, -5);
-    tree.mesh.scale.set(0.3, 0.3, 0.3);
-    scene.add(tree.mesh);
+    treePositions.forEach(position => {
+        let treeModel = sharedTreeModel.clone();
+        treeModel.scale.set(20, 20, 20);
+        treeModel.traverse((child) => {
+            if (child.isMesh) {
+                child.raycast = function () {};
+            }
+        });
+        treeModel.position.set(0, -18, 0);
+        let tree = new Tree();
+        tree.mesh.position.set(position.x, position.y, position.z);
+        tree.mesh.scale.set(0.3, 0.3, 0.3);
+        scene.add(tree.mesh);
+        tree.mesh.add(treeModel);
+    });
 }
 
 export function removeWorldF(scene) {

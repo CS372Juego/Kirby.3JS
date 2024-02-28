@@ -97,11 +97,20 @@ function createLights() {
     dirLight2.position.set(0, 300, 200);
     dirLight2.castShadow = true;
 
+    // Set the direction of the light
+    dirLight1.shadow.camera.left = -100;
+    dirLight1.shadow.camera.right = 100;
+    dirLight1.shadow.camera.top = 100;
+    dirLight1.shadow.camera.bottom = -100;
+    dirLight1.shadow.camera.near = 1;
+    dirLight1.shadow.camera.far = 500;
+
+
     // Set the resolution of the shadow map
-    dirLight1.shadow.mapSize.width = 1024;
-    dirLight1.shadow.mapSize.height = 1024;
-    dirLight2.shadow.mapSize.width = 1024;
-    dirLight2.shadow.mapSize.height = 1024;
+    dirLight1.shadow.mapSize.width = 2048;
+    dirLight1.shadow.mapSize.height = 2048;
+    dirLight2.shadow.mapSize.width = 2048;
+    dirLight2.shadow.mapSize.height = 2048;
 
     // Add lights to scene
     scene.add(hemisphereLight);
@@ -186,6 +195,14 @@ async function createKirby() {
         kirbyModel.traverse((child) => {
             if (child.isMesh) {
                 child.raycast = function () {};
+            }
+        });
+
+        // Enable shadows
+        kirbyModel.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
             }
         });
 
@@ -438,14 +455,14 @@ window.onload = function () {
     init();
 };
 
-function runScene() {
+async function runScene() {
     createLights();
-    createBackground();
-    createWorldS(scene);
-    createWorld1(scene);
-    createWorld2(scene);
-    createWorldF(scene);
-    createKirby();
+    await createBackground();
+    await createWorldS(scene);
+    await createWorld1(scene);
+    await createWorld2(scene);
+    await createWorldF(scene);
+    await createKirby();
     loop();
 }
 
