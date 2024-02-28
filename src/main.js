@@ -156,10 +156,10 @@ async function createKirby() {
         let material = new THREE.MeshPhongMaterial( {visible: false} ); // Set visible to true
         kirby = new THREE.Mesh(geometry, material);
 
-        // kirby.position.set(WORLDS_OFFSET_X, 7, 0);
+        kirby.position.set(WORLDS_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-        kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+        // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
         scene.add(kirby);
 
