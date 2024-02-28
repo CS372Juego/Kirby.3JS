@@ -85,22 +85,28 @@ function handleWindowResize() {
 }
 
 //=====< Add the lights >=====//
-let hemisphereLight, dirLight, ambientLight;
+let hemisphereLight, dirLight1, dirLight2, ambientLight;
 function createLights() {
     // gradient light: sky color - ground color - intensity
     hemisphereLight = new THREE.HemisphereLight(0xFFC0D9, 0x000000, 0.9)
     ambientLight = new THREE.AmbientLight(0xDCF2F1, 1);
-    dirLight = new THREE.DirectionalLight(0xDCF2F1, 0.9);
-    dirLight.position.set(0, 300, -100);
-    dirLight.castShadow = true;
+    dirLight1 = new THREE.DirectionalLight(0xDCF2F1, 0.9);
+    dirLight1.position.set(0, 300, -100);
+    dirLight1.castShadow = true;
+    dirLight2 = new THREE.DirectionalLight(0xDCF2F1, 0.9);
+    dirLight2.position.set(0, 300, 200);
+    dirLight2.castShadow = true;
 
     // Set the resolution of the shadow map
-    dirLight.shadow.mapSize.width = 1024;
-    dirLight.shadow.mapSize.height = 1024;
+    dirLight1.shadow.mapSize.width = 1024;
+    dirLight1.shadow.mapSize.height = 1024;
+    dirLight2.shadow.mapSize.width = 1024;
+    dirLight2.shadow.mapSize.height = 1024;
 
     // Add lights to scene
     scene.add(hemisphereLight);
-    scene.add(dirLight);
+    scene.add(dirLight1);
+    scene.add(dirLight2);
 }
 
 //=====< Add Background >=====//
