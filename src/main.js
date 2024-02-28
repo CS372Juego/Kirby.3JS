@@ -31,7 +31,7 @@ const clock = new THREE.Clock();
 
 // teleport list
 const tpPosList = [
-    [new THREE.Vector3(WORLDS_OFFSET_X + 25, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
+    [new THREE.Vector3(WORLDS_OFFSET_X + 30, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X - 80, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 40, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 95, 7, 0)]
 ];
