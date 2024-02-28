@@ -9,26 +9,33 @@
 import * as THREE from 'three';
 import { ColladaLoader } from 'ColladaLoader';
 import { MMDLoader } from 'MMDLoader';
-import { PortalManager } from './PortalManager.js';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
+import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
-import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
 let kirby, kirbyModel;
-let portalManager;
 let targetPosition;
 let isGameRunning = true;
 let walkingAnimationIndex = 2;
+let arrowUpPressed = false;
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
 const LAND_END = -5;
 const clock = new THREE.Clock();
+
+// teleport list
+const tpPosList = [
+    [new THREE.Vector3(WORLDS_OFFSET_X + 25, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
+    [new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X - 80, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0)],
+    [new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 40, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 95, 7, 0)]
+];
+
 
 const colladaLoader = new ColladaLoader();
 const mmdLoader = new MMDLoader();
@@ -137,10 +144,10 @@ async function createKirby() {
         let material = new THREE.MeshPhongMaterial( {visible: false} ); // Set visible to true
         kirby = new THREE.Mesh(geometry, material);
 
-        kirby.position.set(WORLDS_OFFSET_X, 7, 0);
+        // kirby.position.set(WORLDS_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-        // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+        kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
         scene.add(kirby);
 
@@ -174,18 +181,33 @@ async function createKirby() {
 //=====< Add Keyboard Interaction >=====//
 const keyState = {};
 window.addEventListener('keydown', (event) => {
-    keyState[event.code] = true;
+    if (event.code === 'ArrowUp') {
+        if (!arrowUpPressed) {
+            // Allow only one keypress
+            // https://stackoverflow.com/questions/5353254/javascript-onkeydown-event-fire-only-once
+            if (event.repeat) return;
+            arrowUpPressed = true;
+            checkAndTeleportKirby();
+        }
+    } else {
+        keyState[event.code] = true;
+    }
     if (event.shiftKey) {
         kirbySpeed = baseKirbySpeed * 2; // Double the speed
         walkingAnimationIndex = 1;
+        keyState[event.code] = true;
     } else {
         kirbySpeed = baseKirbySpeed; // Normal speed
         walkingAnimationIndex = 2;
+        keyState[event.code] = true;
     }
 });
 
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
+    if (event.code === 'ArrowUp') {
+        arrowUpPressed = false;
+    }
     kirbySpeed = baseKirbySpeed; // Reset speed
     if (event.shiftKey) {
         kirbyModel.cueAnimation(2, true, 0.3);
@@ -334,15 +356,25 @@ function updateKirbyPosition(deltaTime) {
 }
 
 
-//=====< Create Portals >=====//
-function createPortals() {
-    portalManager = new PortalManager(scene);
-    
-    // TO DO: ADD PORTAL POSITIONS
-    portalManager.addPortal(new THREE.Vector3(/* Portal 1 Position */), new THREE.Vector3(/* Destination 1 */));
-    portalManager.addPortal(new THREE.Vector3(/* Portal 2 Position */), new THREE.Vector3(/* Destination 2 */));
-    
+//=====< Teleport Portals >=====//
+function checkAndTeleportKirby() {
+    for (const [posA, posB] of tpPosList) {
+        if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
+            kirby.position.set(posB.x, posB.y, posB.z);
+            targetPosition.x = posB.x;
+            targetPosition.y = posB.y;
+            targetPosition.z = posB.z;
+            return;
+        } else if (kirby.position.distanceTo(posB) <= 5 && arrowUpPressed) {
+            kirby.position.set(posA.x, posA.y, posA.z);
+            targetPosition.x = posA.x;
+            targetPosition.y = posA.y;
+            targetPosition.z = posA.z;
+            return;
+        }
+    }
 }
+
 
 //=====< Main Animation Loop >=====//
 function loop() {
@@ -359,12 +391,9 @@ function loop() {
 
     handleKeyboardInput(deltaTime, direction);
     updateKirbyPosition(deltaTime);
-
+    
     kirbyModel.advanceAnimation(deltaTime);
     alignRotation(kirbyModel, direction);
-    
-    // Uncomment the code below after creating the portal(with positions)
-    // portalManager.checkPortals(kirby, keyState);
 
     // Camera for gameplay
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
@@ -389,7 +418,6 @@ function alignRotation(obj, vel) {
     }
 }
 
-
 //=====< Initialize >=====//
 window.onload = function () {
     init();
@@ -403,7 +431,6 @@ function runScene() {
     createWorld2(scene);
     createWorldF(scene);
     createKirby();
-    // createPortals();
     loop();
 }
 
@@ -411,5 +438,3 @@ function init(event) {
     createScene();
     runScene();
 }
-
-
