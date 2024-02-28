@@ -104,33 +104,45 @@ function createLights() {
 }
 
 //=====< Add Background >=====//
-function createBackground() {
+async function createBackground() {
     try {
-        colladaLoader.load('../assets/model/forest/log_fix.dae', function (collada) {
-            let dae = collada.scene;
-
-            dae.scale.set(5, 5, 5);
-            dae.position.set(-50, -30, -50);
-
-            // Get rid of black bounding boxes for the texture
-            dae.traverse((child) => {
-                if (child.isMesh && child.material) {
-                    child.material.transparent = true;
-                    child.material.alphaTest = 0.5;
-                    if (child.material.map) {
-                        child.material.map.needsUpdate = true;
-                    }
-                }
+        // Wrap the loader in a promise
+        const loadModel = () => {
+            return new Promise((resolve, reject) => {
+                colladaLoader.load('../assets/model/forest/log_fix.dae', (collada) => {
+                    resolve(collada); // Resolve the promise with the loaded model
+                }, undefined, (error) => {
+                    reject(error); // Reject the promise if there's an error
+                });
             });
+        };
 
-            // Disable raycasting for the background model
-            dae.traverse((child) => {
-                if (child.isMesh) {
-                    child.raycast = function () {};
+        const collada = await loadModel();
+        let dae = collada.scene;
+
+        dae.scale.set(5, 5, 5);
+        dae.position.set(-50, -30, -50);
+
+        // To get rid of black bounding boxes
+        dae.traverse((child) => {
+            if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.alphaTest = 0.5;
+                if (child.material.map) {
+                    child.material.map.needsUpdate = true;
                 }
-            });
-            scene.add(dae);
+            }
         });
+
+        // Bypass raycasting for the model
+        dae.traverse((child) => {
+            if (child.isMesh) {
+                child.raycast = function () {};
+            }
+        });
+
+        scene.add(dae);
+
     } catch (error) {
         console.error("Error loading model:", error);
     }
