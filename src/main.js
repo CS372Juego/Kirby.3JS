@@ -7,14 +7,13 @@
  */
 
 import * as THREE from 'three';
-import { GLTFLoader } from 'GLTFLoader';
 import { ColladaLoader } from 'ColladaLoader';
 import { MMDLoader } from 'MMDLoader';
-import { Colors } from './color.js';
 import { PortalManager } from './PortalManager.js';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
+import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
@@ -30,7 +29,7 @@ const CAMERA_SMOOTHNESS = 0.1;
 const LAND_BEGIN = 5;
 const LAND_END = -5;
 const clock = new THREE.Clock();
-const gtlfLoader = new GLTFLoader();
+
 const colladaLoader = new ColladaLoader();
 const mmdLoader = new MMDLoader();
 
@@ -79,21 +78,14 @@ function handleWindowResize() {
 }
 
 //=====< Add the lights >=====//
-let hemisphereLight, dirLight;
+let hemisphereLight, dirLight, ambientLight;
 function createLights() {
     // gradient light: sky color - ground color - intensity
     hemisphereLight = new THREE.HemisphereLight(0xFFC0D9, 0x000000, 0.9)
+    ambientLight = new THREE.AmbientLight(0xDCF2F1, 1);
     dirLight = new THREE.DirectionalLight(0xDCF2F1, 0.9);
-    dirLight.position.set(50, 350, 200);
+    dirLight.position.set(0, 300, -100);
     dirLight.castShadow = true;
-
-    // define the visible area of the projected shadow
-    dirLight.shadow.camera.left = -40;
-    dirLight.shadow.camera.right = 40;
-    dirLight.shadow.camera.top = 40;
-    dirLight.shadow.camera.bottom = -40;
-    dirLight.shadow.camera.near = 1;
-    dirLight.shadow.camera.far = 100;
 
     // Set the resolution of the shadow map
     dirLight.shadow.mapSize.width = 1024;
@@ -104,6 +96,38 @@ function createLights() {
     scene.add(dirLight);
 }
 
+//=====< Add Background >=====//
+function createBackground() {
+    try {
+        colladaLoader.load('../assets/model/forest/log_fix.dae', function (collada) {
+            let dae = collada.scene;
+
+            dae.scale.set(5, 5, 5);
+            dae.position.set(-50, -30, -50);
+
+            // Get rid of black bounding boxes for the texture
+            dae.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    child.material.transparent = true;
+                    child.material.alphaTest = 0.5;
+                    if (child.material.map) {
+                        child.material.map.needsUpdate = true;
+                    }
+                }
+            });
+
+            // Disable raycasting for the background model
+            dae.traverse((child) => {
+                if (child.isMesh) {
+                    child.raycast = function () {};
+                }
+            });
+            scene.add(dae);
+        });
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
+}
 
 //=======< Add Kirby >=====//
 async function createKirby() {
@@ -113,7 +137,8 @@ async function createKirby() {
         let material = new THREE.MeshPhongMaterial( {visible: false} ); // Set visible to true
         kirby = new THREE.Mesh(geometry, material);
 
-        kirby.position.set(LAND_BEGIN_X, 7, 0);
+        kirby.position.set(WORLDS_OFFSET_X, 7, 0);
+        // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
@@ -184,6 +209,7 @@ const gravity = -0.15;
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
+        // TODO: Maybe make a global variable for collision and only move kirby when there is no collision?
         targetPosition.z -= kirbySpeed * deltaTime * 100;
         direction.z -= baseKirbySpeed;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
@@ -342,13 +368,13 @@ function loop() {
 
     // Camera for gameplay
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 10, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 20, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 20, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 30, CAMERA_SMOOTHNESS);
 
     // Camera for construction
-    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    // camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
-    // camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
+    camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
     requestAnimationFrame(loop);
     renderer.render(scene,camera)
@@ -371,6 +397,8 @@ window.onload = function () {
 
 function runScene() {
     createLights();
+    createBackground();
+    createWorldS(scene);
     createWorld1(scene);
     createWorld2(scene);
     createWorldF(scene);
