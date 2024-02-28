@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { Colors } from './color.js';
+import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 
 // Temporary tree from project5..
-// To be replaced with a model
+// TO DO: Load model to the trunk (collision detection with trunk, but not leaves)
+// TO DO: bypass raycasting for model
 export class Tree {
     constructor() {
         this.mesh = new THREE.Object3D();

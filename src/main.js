@@ -151,9 +151,8 @@ async function createBackground() {
 //=======< Add Kirby >=====//
 async function createKirby() {
     try {
-        // let geometry = new THREE.DodecahedronGeometry(KIRBY_SIZE, KIRBY_SIZE);
         let geometry = new THREE.SphereGeometry(KIRBY_SIZE, 32, 32);
-        let material = new THREE.MeshPhongMaterial( {visible: false} ); // Set visible to true
+        let material = new THREE.MeshPhongMaterial( {visible: false} );
         kirby = new THREE.Mesh(geometry, material);
 
         kirby.position.set(WORLDS_OFFSET_X, 7, 0);
@@ -367,7 +366,6 @@ function updateKirbyPosition(deltaTime) {
     }
 }
 
-
 //=====< Teleport Portals >=====//
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
@@ -386,7 +384,6 @@ function checkAndTeleportKirby() {
         }
     }
 }
-
 
 //=====< Main Animation Loop >=====//
 function loop() {
@@ -413,9 +410,9 @@ function loop() {
     camera.position.z = lerp(camera.position.z, kirby.position.z + 30, CAMERA_SMOOTHNESS);
 
     // Camera for construction
-    camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
+    // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
+    // camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
+    // camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
     requestAnimationFrame(loop);
     renderer.render(scene,camera)
