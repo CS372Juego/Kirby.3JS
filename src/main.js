@@ -27,7 +27,7 @@ let walkingAnimationIndex = 2;
 
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
-const CAMERA_SMOOTHNESS = 0.1;
+const CAMERA_SMOOTHNESS = 0.04;
 const LAND_BEGIN = 5;
 const LAND_END = -5;
 const clock = new THREE.Clock();
@@ -554,9 +554,13 @@ async function runScene() {
 
 function fadeOutTitleScreen() {
     let titleScreen = document.getElementById('titleScreen');
+    let containerScreen = document.getElementById('container');
     titleScreen.style.transition = "opacity 0.5s ease-out";
+    containerScreen.style.transition = "opacity 0.5s ease-out";
     titleScreen.style.opacity = 0;
+    containerScreen.style.opacity = 0;
     setTimeout(function() {
         titleScreen.style.display = 'none';
+        containerScreen.style.display = 'none';
     }, 500);
 }
