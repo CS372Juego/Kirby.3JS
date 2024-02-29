@@ -56,12 +56,15 @@ export class Spikes {
 export class StarBox {
     constructor() {
         this.mesh = new THREE.Object3D();
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('../assets/texture/starbox.png');
+
         let geoBox = new THREE.BoxGeometry(5, 5, 5);
-        let matBox = new THREE.MeshPhongMaterial({
-            color: Colors.yellow,
-        });
-        
+        let matBox = new THREE.MeshPhongMaterial({ map: texture });
         let starBox = new THREE.Mesh(geoBox, matBox);
+        
+        starBox.castShadow = true;
+        starBox.receiveShadow = true;
         this.mesh.add(starBox);
     }
 }
