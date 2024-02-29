@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { ColladaLoader } from 'ColladaLoader';
 import { MMDLoader } from 'MMDLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
+import { SoundManager } from './SoundManager.js';
 import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
 import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
@@ -18,11 +19,15 @@ import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
 let kirby, kirbyModel;
+let soundManager;
 let targetPosition;
 let isGameRunning = true;
 let walkingAnimationIndex = 2;
 let arrowUpPressed = false;
 let audioLoader, listener, audio;
+let hasPlayedClearSound = false;
+let canPlaySounds = true;
+
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
@@ -35,6 +40,7 @@ const worldStartBoundaries = [WORLDS_OFFSET_X - 30, WORLDS_OFFSET_X + 35];
 const world1Boundaries = [LAND_BEGIN_X - 5, LAND_BEGIN_X + WORLD2_OFFSET_X - 75];
 const world2Boundaries = [LAND_BEGIN_X + WORLD2_OFFSET_X - 5, LAND_BEGIN_X + WORLDF_OFFSET_X + 45];
 const finalWorldBoundaries = [LAND_BEGIN_X + WORLDF_OFFSET_X + 90, LAND_BEGIN_X + WORLDF_OFFSET_X + 175];
+const starPosition = new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 135, 10, -5);
 
 const tpPosList = [
     [new THREE.Vector3(WORLDS_OFFSET_X + 30, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
@@ -66,7 +72,7 @@ function createScene() {
         nearPlane,
         farPlane
     );
-    camera.rotateX(-Math.PI / 8);
+    camera.rotateX(-Math.PI / 10);
 
     // Create the renderer
     renderer = new THREE.WebGLRenderer({
@@ -90,68 +96,46 @@ function handleWindowResize() {
 }
 
 //=====< Create Audio Files >=====//
-let soundTracks = {};
+function createAudio() {
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+    soundManager = new SoundManager(listener);
 
-const sounds = [
-    { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', volume: 0.5, loop: true },
-    { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', volume: 0.3, loop: true },
-    { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', volume: 0.4, loop: true },
-    { name: 'finalWorld', url: '../assets/audio/BGM/end.mp3', volume: 0.1, loop: false }
-];
+    // Load sounds
+    // https://downloads.khinsider.com/game-soundtracks/album/kirby-super-star-ultra
+    const sounds = [
+        { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.8 }},
+        { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.3 }},
+        { name: 'clear', url: '../assets/audio/BGM/clear.mp3', options: { loop: false, volume: 0.3 }},
+        { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.5 }},
+        { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.3 }},
+        { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.4 }},
+        { name: 'finalWorld', url: '../assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.1 }}
+    ];
 
-function preloadSounds() {
-    sounds.forEach(sound => {
-        let audio = new THREE.Audio(listener);
-        audioLoader.load(sound.url, (buffer) => {
-            audio.setBuffer(buffer);
-            audio.setLoop(sound.loop);
-            audio.setVolume(sound.volume);
-            soundTracks[sound.name] = audio;
-        });
-    });
+    Promise.all(sounds.map(sound => 
+        soundManager.loadSound(sound.name, sound.url, sound.options)
+    )).then(() => {
+        console.log("All sounds loaded");
+        
+    }).catch(err => console.error("Error loading sounds:", err));
 }
 
 let lastWorld = '';
 function updateWorldMusic() {
     const newWorld = getCurrentWorld(kirby.position.x);
 
-    // Check if the world has changed to avoid unnecessary stops and starts
     if (newWorld !== lastWorld) {
-        // Stop all currently playing tracks
-        for (let key in soundTracks) {
-            if (soundTracks.hasOwnProperty(key) && soundTracks[key].isPlaying) {
-                soundTracks[key].stop();
-            }
+        if (lastWorld) {
+            setTimeout(() => soundManager.playSound(newWorld, true), 500);
         }
 
-        // Start the new track if it exists
-        if (soundTracks[newWorld]) {
-            soundTracks[newWorld].play();
-        }
-
-        lastWorld = newWorld; // Update the last known world
+        setTimeout(() => {
+            soundManager.playSound(newWorld, true);
+        }, 500);
+        // soundManager.playSound(newWorld, true);
+        lastWorld = newWorld;
     }
-}
-
-
-function createAudio() {
-    audioLoader = new THREE.AudioLoader();
-    listener = new THREE.AudioListener();
-    camera.add(listener);
-    audio = new THREE.Audio(listener);
-    preloadSounds();
-}
-
-function playSound(url, repeat, volume) {
-    audioLoader.load(url, function(buffer) {
-        if (audio.isPlaying) {
-            audio.stop(); // Stop the currently playing sound before starting it again
-        }
-        audio.setBuffer(buffer);
-        audio.setLoop(repeat);
-        audio.setVolume(volume);
-        audio.play();
-    });
 }
 
 //=====< Add the lights >=====//
@@ -242,6 +226,7 @@ async function createKirby() {
 
 
         kirby.position.set(WORLDS_OFFSET_X, 7, 0);
+
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
@@ -276,7 +261,6 @@ async function createKirby() {
                 child.receiveShadow = true;
             }
         });
-
         kirby.add(kirbyModel);
     } catch (error) {
         console.error("Error loading model:", error);
@@ -371,7 +355,7 @@ function handleKeyboardInput(deltaTime, direction) {
         // kirbyModel.cueAnimation(0, false, 0.3);
         isJumping = true;
         jumpVelocity = jumpSpeed;
-        playSound('../assets/audio/SE/jump.wav', false, 0.8);
+        soundManager.playSound('jump');
     }
 
     // Boundary checks
@@ -465,16 +449,18 @@ function updateKirbyPosition(deltaTime) {
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
         if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
-            playSound('../assets/audio/SE/teleport.wav', false, 0.3); // Play teleport sound
-            kirby.position.set(posB.x, posB.y, posB.z); // Teleport Kirby
+            soundManager.stopAllSounds();
+            soundManager.playSound('teleport');
+            kirby.position.set(posB.x, posB.y, posB.z);
             targetPosition.x = posB.x;
             targetPosition.y = posB.y;
             targetPosition.z = posB.z;
             updateWorldMusic(); // Update the music based on the new location
             return;
         } else if (kirby.position.distanceTo(posB) <= 5 && arrowUpPressed) {
-            playSound('../assets/audio/SE/teleport.wav', false, 0.3); // Play teleport sound
-            kirby.position.set(posA.x, posA.y, posA.z); // Teleport Kirby back
+            soundManager.stopAllSounds();
+            soundManager.playSound('teleport');
+            kirby.position.set(posA.x, posA.y, posA.z);
             targetPosition.x = posA.x;
             targetPosition.y = posA.y;
             targetPosition.z = posA.z;
@@ -483,6 +469,7 @@ function checkAndTeleportKirby() {
         }
     }
 }
+
 
 function getCurrentWorld(kirbyX) {
     if (kirbyX >= worldStartBoundaries[0] && kirbyX <= worldStartBoundaries[1]) {
@@ -502,9 +489,7 @@ function getCurrentWorld(kirbyX) {
 function loop() {
     const deltaTime = clock.getDelta(); 
 
-    if (!isGameRunning) {
-        return;
-    }
+    if (!isGameRunning) { return; }
 
     let direction = {
         x: 0,
@@ -519,14 +504,23 @@ function loop() {
 
     // Camera for gameplay
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 18, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 27, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 12, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 32, CAMERA_SMOOTHNESS);
 
     // Camera for construction
     // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
     // camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
     // camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
+    // Play clear sound when kirby got the star
+    let distance = kirby.position.distanceTo(starPosition);
+    if (distance <= 3 && !hasPlayedClearSound) {
+        soundManager.stopAllSounds();
+        soundManager.playSound('clear');
+        canPlaySounds = false;
+        hasPlayedClearSound = true; 
+    }
+
     requestAnimationFrame(loop);
     renderer.render(scene,camera)
 }
@@ -534,7 +528,7 @@ function loop() {
 function alignRotation(obj, vel) {
     if(vel.x != 0 || vel.z != 0) {
         const targetAngle = -Math.atan2(vel.z, vel.x);
-        var targetRotation = new THREE.Quaternion();
+        let targetRotation = new THREE.Quaternion();
         targetRotation.setFromEuler(new THREE.Euler(0, targetAngle, 0));
         obj.quaternion.rotateTowards(targetRotation, 0.1);
     }
@@ -548,10 +542,9 @@ window.onload = function () {
 async function runScene() {
     createLights();
     createAudio();
+    // Play recovery music by default
     setTimeout(() => {
-        if (soundTracks['restingArea']) {
-            soundTracks['restingArea'].play();
-        }
+        soundManager.playSound('restingArea', true);
     }, 1000);
     await createBackground();
     await createWorldS(scene);
