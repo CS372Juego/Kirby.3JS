@@ -11,7 +11,7 @@ const LAND_BEGIN_X = -LAND_LENGTH / 2 + LAND_OFFSET;
 const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 
 // Global variables for reuse
-// TO DO: Texture map the ground
+// TO DO: Texture map the ground, and get shadows
 let geometry, plain;
 let material = new THREE.MeshPhongMaterial({ color: Colors.green });
 
