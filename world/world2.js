@@ -143,13 +143,13 @@ export async function createWorld2(scene) {
     const sharedTreeModel = await loadTreeModel();
     const treePositions = [
         {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 5, y: 10, z: -5},
-        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 30, y: 23, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 30, y: 20, z: -5},
         {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 58, y: 75, z: -5},
         {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 72, y: 75, z: -5},
         {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 172, y: 75, z: -5},
         {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 188, y: 75, z: -5},
-        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 250, y: 9, z: -5},
-        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 265, y: 9, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 250, y: 10, z: -5},
+        {x: LAND_BEGIN_X + WORLD2_OFFSET_X + 265, y: 10, z: -5},
     ];
 
     treePositions.forEach(position => {

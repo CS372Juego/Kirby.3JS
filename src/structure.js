@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { Colors } from './color.js';
+import { OBJLoader } from 'OBJLoader';
+import { MTLLoader } from 'MTLLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 
 // Temporary tree from project5..
@@ -62,9 +64,42 @@ export class StarBox {
         let geoBox = new THREE.BoxGeometry(5, 5, 5);
         let matBox = new THREE.MeshPhongMaterial({ map: texture });
         let starBox = new THREE.Mesh(geoBox, matBox);
-        
+
         starBox.castShadow = true;
         starBox.receiveShadow = true;
         this.mesh.add(starBox);
     }
+}
+
+export class Star {
+    constructor(){
+        this.mesh = new THREE.Object3D();
+        let geometryStar = new THREE.CylinderGeometry(5, 5, 2, 5);
+        let materialStar = new THREE.MeshPhongMaterial({ visible: false });
+        let star = new THREE.Mesh(geometryStar, materialStar);
+        star.position.set(0, 0, 0);
+        star.rotation.x = -Math.PI / 2;
+        this.mesh.add(star);
+    }
+}
+
+export async function loadStarModel() {
+    return new Promise((resolve, reject) => {
+        const mtlLoader = new MTLLoader();
+
+        mtlLoader.load('../assets/model/star/WarpStar.mtl', (materials) => {
+            materials.preload();
+            const objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.load('../assets/model/star/WarpStar.obj', (obj) => {
+                obj.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                resolve(obj);
+            }, undefined, reject);
+        });
+    });
 }

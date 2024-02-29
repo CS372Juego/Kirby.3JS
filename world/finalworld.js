@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Colors } from '../src/color.js';
-import { Tree, loadTreeModel } from '../src/structure.js';
+import { Tree, Star, loadTreeModel, loadStarModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLDF_OFFSET_X = 580;
@@ -58,6 +58,21 @@ export async function createWorldF(scene) {
         scene.add(tree.mesh);
         tree.mesh.add(treeModel);
     });
+
+    //=====< Star >=====//
+    let star = new Star();
+    star.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 35, 20, -5);
+    scene.add(star.mesh);
+
+    let starModel = await loadStarModel();
+    starModel.scale.set(18, 18, 18);
+
+    starModel.traverse((child) => {
+        if (child.isMesh) {
+            child.raycast = function () {};
+        }
+    });
+    star.mesh.add(starModel);
 }
 
 export function removeWorldF(scene) {

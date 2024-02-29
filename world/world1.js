@@ -101,8 +101,8 @@ export async function createWorld1(scene) {
     const treePositions = [
         {x: LAND_BEGIN_X + 10, y: 15, z: -5},
         {x: LAND_BEGIN_X + 180, y: 20, z: -5},
-        {x: LAND_BEGIN_X + 250, y: 9, z: -5},
-        {x: LAND_BEGIN_X + 265, y: 9, z: -5},
+        {x: LAND_BEGIN_X + 250, y: 10, z: -5},
+        {x: LAND_BEGIN_X + 265, y: 10, z: -5},
     ];
 
     treePositions.forEach(position => {
