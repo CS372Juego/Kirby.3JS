@@ -22,6 +22,7 @@ let targetPosition;
 let isGameRunning = true;
 let walkingAnimationIndex = 2;
 let arrowUpPressed = false;
+let audioLoader, listener, audio;
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.1;
@@ -29,13 +30,17 @@ const LAND_BEGIN = 5;
 const LAND_END = -5;
 const clock = new THREE.Clock();
 
-// teleport list
+// World Coordinates
+const worldStartBoundaries = [WORLDS_OFFSET_X - 30, WORLDS_OFFSET_X + 35];
+const world1Boundaries = [LAND_BEGIN_X - 5, LAND_BEGIN_X + WORLD2_OFFSET_X - 75];
+const world2Boundaries = [LAND_BEGIN_X + WORLD2_OFFSET_X - 5, LAND_BEGIN_X + WORLDF_OFFSET_X + 45];
+const finalWorldBoundaries = [LAND_BEGIN_X + WORLDF_OFFSET_X + 90, LAND_BEGIN_X + WORLDF_OFFSET_X + 175];
+
 const tpPosList = [
     [new THREE.Vector3(WORLDS_OFFSET_X + 30, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X - 80, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 40, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 95, 7, 0)]
 ];
-
 
 const colladaLoader = new ColladaLoader();
 const mmdLoader = new MMDLoader();
@@ -82,6 +87,71 @@ function handleWindowResize() {
     renderer.setSize(WIDTH, HEIGHT);
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
+}
+
+//=====< Create Audio Files >=====//
+let soundTracks = {};
+
+const sounds = [
+    { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', volume: 0.5, loop: true },
+    { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', volume: 0.3, loop: true },
+    { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', volume: 0.4, loop: true },
+    { name: 'finalWorld', url: '../assets/audio/BGM/end.mp3', volume: 0.1, loop: false }
+];
+
+function preloadSounds() {
+    sounds.forEach(sound => {
+        let audio = new THREE.Audio(listener);
+        audioLoader.load(sound.url, (buffer) => {
+            audio.setBuffer(buffer);
+            audio.setLoop(sound.loop);
+            audio.setVolume(sound.volume);
+            soundTracks[sound.name] = audio;
+        });
+    });
+}
+
+let lastWorld = '';
+function updateWorldMusic() {
+    const newWorld = getCurrentWorld(kirby.position.x);
+
+    // Check if the world has changed to avoid unnecessary stops and starts
+    if (newWorld !== lastWorld) {
+        // Stop all currently playing tracks
+        for (let key in soundTracks) {
+            if (soundTracks.hasOwnProperty(key) && soundTracks[key].isPlaying) {
+                soundTracks[key].stop();
+            }
+        }
+
+        // Start the new track if it exists
+        if (soundTracks[newWorld]) {
+            soundTracks[newWorld].play();
+        }
+
+        lastWorld = newWorld; // Update the last known world
+    }
+}
+
+
+function createAudio() {
+    audioLoader = new THREE.AudioLoader();
+    listener = new THREE.AudioListener();
+    camera.add(listener);
+    audio = new THREE.Audio(listener);
+    preloadSounds();
+}
+
+function playSound(url, repeat, volume) {
+    audioLoader.load(url, function(buffer) {
+        if (audio.isPlaying) {
+            audio.stop(); // Stop the currently playing sound before starting it again
+        }
+        audio.setBuffer(buffer);
+        audio.setLoop(repeat);
+        audio.setVolume(volume);
+        audio.play();
+    });
 }
 
 //=====< Add the lights >=====//
@@ -169,6 +239,7 @@ async function createKirby() {
         let geometry = new THREE.SphereGeometry(KIRBY_SIZE, 32, 32);
         let material = new THREE.MeshPhongMaterial( {visible: false} );
         kirby = new THREE.Mesh(geometry, material);
+
 
         kirby.position.set(WORLDS_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
@@ -300,6 +371,7 @@ function handleKeyboardInput(deltaTime, direction) {
         // kirbyModel.cueAnimation(0, false, 0.3);
         isJumping = true;
         jumpVelocity = jumpSpeed;
+        playSound('../assets/audio/SE/jump.wav', false, 0.8);
     }
 
     // Boundary checks
@@ -393,18 +465,36 @@ function updateKirbyPosition(deltaTime) {
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
         if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
-            kirby.position.set(posB.x, posB.y, posB.z);
+            playSound('../assets/audio/SE/teleport.wav', false, 0.3); // Play teleport sound
+            kirby.position.set(posB.x, posB.y, posB.z); // Teleport Kirby
             targetPosition.x = posB.x;
             targetPosition.y = posB.y;
             targetPosition.z = posB.z;
+            updateWorldMusic(); // Update the music based on the new location
             return;
         } else if (kirby.position.distanceTo(posB) <= 5 && arrowUpPressed) {
-            kirby.position.set(posA.x, posA.y, posA.z);
+            playSound('../assets/audio/SE/teleport.wav', false, 0.3); // Play teleport sound
+            kirby.position.set(posA.x, posA.y, posA.z); // Teleport Kirby back
             targetPosition.x = posA.x;
             targetPosition.y = posA.y;
             targetPosition.z = posA.z;
+            updateWorldMusic(); // Update the music based on the new location
             return;
         }
+    }
+}
+
+function getCurrentWorld(kirbyX) {
+    if (kirbyX >= worldStartBoundaries[0] && kirbyX <= worldStartBoundaries[1]) {
+        return 'restingArea';
+    } else if (kirbyX >= world1Boundaries[0] && kirbyX <= world1Boundaries[1]) {
+        return 'world1';
+    } else if (kirbyX >= world2Boundaries[0] && kirbyX <= world2Boundaries[1]) {
+        return 'world2';
+    } else if (kirbyX >= finalWorldBoundaries[0] && kirbyX <= finalWorldBoundaries[1]) {
+        return 'finalWorld';
+    } else {
+        return 'unknown';
     }
 }
 
@@ -429,8 +519,8 @@ function loop() {
 
     // Camera for gameplay
     camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
-    camera.position.y = lerp(camera.position.y, kirby.position.y + 20, CAMERA_SMOOTHNESS);
-    camera.position.z = lerp(camera.position.z, kirby.position.z + 30, CAMERA_SMOOTHNESS);
+    camera.position.y = lerp(camera.position.y, kirby.position.y + 18, CAMERA_SMOOTHNESS);
+    camera.position.z = lerp(camera.position.z, kirby.position.z + 27, CAMERA_SMOOTHNESS);
 
     // Camera for construction
     // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
@@ -457,6 +547,12 @@ window.onload = function () {
 
 async function runScene() {
     createLights();
+    createAudio();
+    setTimeout(() => {
+        if (soundTracks['restingArea']) {
+            soundTracks['restingArea'].play();
+        }
+    }, 1000);
     await createBackground();
     await createWorldS(scene);
     await createWorld1(scene);
