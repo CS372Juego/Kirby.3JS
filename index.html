@@ -13,11 +13,63 @@
       overflow: hidden;
       background: linear-gradient(#AEDEFC, #B6FFFA);
     }
-    
+
     canvas { display: block; }
+
+    #titleScreen {
+      display: flex;
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      width: 50%;
+      height: 50%;
+      transform: translate(-50%, -50%);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background-color: rgba(253, 229, 236, 0.5);
+      padding: 40px;
+      border-radius: 100px;
+    }
+
+    #titleScreen div {
+      text-align: center;
+    }
+
+    #titleScreen h1 {
+      margin: 0 0 20px;
+      font-size: 100px;
+    }
+
+    #playButton {
+      border: none;
+        background-color: #FAF3F0;
+        transition: background-color 0.4s;
+        border-radius: 70px;
+        padding: 20px;
+        padding-left: 60px;
+        padding-right: 60px;
+        font-family: 'Fredoka';
+        font-size: 70px;
+        cursor: pointer;
+        margin-top: 30px;
+    }
+
+    #playButton:hover {
+      background-color: #F3D7CA;
+      transition: background-color 0.4s;
+    }
   </style>
 </head>
 <body>
+  <!-- TO DO: Update titlescreen with better design (e.g. image) -->
+  <div id="titleScreen">
+    <div style="text-align: center;">
+        <h1>Kirby 128</h1>
+        <button id="playButton">Play</button>
+    </div>
+  </div>
+
   <script type="importmap">
     {
         "imports": {

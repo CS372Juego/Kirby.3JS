@@ -59,7 +59,7 @@ function createScene() {
     // Create the scene
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0xFAF1E4, 100, 950);
-    // scene.fog.far = 200;
+    scene.fog.far = 900;
 
     // Create the camera
     fieldOfView = 75;
@@ -535,9 +535,13 @@ function alignRotation(obj, vel) {
 }
 
 //=====< Initialize >=====//
-window.onload = function () {
-    init();
+window.onload = function() {
+    document.getElementById('playButton').addEventListener('click', function() {
+        init();
+        fadeOutTitleScreen();
+    });
 };
+
 
 async function runScene() {
     createLights();
@@ -558,4 +562,13 @@ async function runScene() {
 function init(event) {
     createScene();
     runScene();
+}
+
+function fadeOutTitleScreen() {
+    var titleScreen = document.getElementById('titleScreen');
+    titleScreen.style.transition = "opacity 0.5s ease-out";
+    titleScreen.style.opacity = 0;
+    setTimeout(function() {
+        titleScreen.style.display = 'none';
+    }, 500);
 }
