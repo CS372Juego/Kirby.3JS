@@ -312,10 +312,10 @@ window.addEventListener('keyup', (event) => {
 // Function to handle keyboard input
 const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
-let isJumping = false;
-let jumpVelocity = 10;
-const jumpSpeed = 1.75;
-const gravity = -0.15;
+let onGround = true;
+let yVelocity = 0;
+const jumpSpeed = 0.75;
+const gravity = 0.15;
 
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
@@ -348,13 +348,14 @@ function handleKeyboardInput(deltaTime, direction) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
     }
-    if (keyState['Space'] && !isJumping) {
+    if (keyState['Space'] && onGround) {
         // I don't believe this has any noticeable effect and it causes the
         // idle animation to not loop if you just jump without moving, so I
         // have commented it out for now. 
-        // kirbyModel.cueAnimation(0, false, 0.3);
-        isJumping = true;
-        jumpVelocity = jumpSpeed;
+        // kirbyModel.cueAnimation(0, true, 0.3);
+        onGround = false;
+        // jumpVelocity = jumpSpeed;
+        yVelocity = jumpSpeed;
         soundManager.playSound('jump');
     }
 
@@ -396,8 +397,10 @@ function updateKirbyPosition(deltaTime) {
 
     let wallDetected = wallIntersects.length > 0;
 
-    if (!wallDetected) {
-        // Update horizontal movement if no wall is detected
+    if (wallDetected) {
+        targetPosition.x = kirby.position.x;
+        targetPosition.z = kirby.position.z;
+    } else {
         kirby.position.x = lerp(kirby.position.x, targetPosition.x, SMOOTHNESS);
         kirby.position.z = lerp(kirby.position.z, targetPosition.z, SMOOTHNESS);
     }
@@ -406,42 +409,27 @@ function updateKirbyPosition(deltaTime) {
     let groundRaycaster = new THREE.Raycaster(kirby.position, downVector);
     let intersects = groundRaycaster.intersectObjects(scene.children, true);
 
+    yVelocity -= gravity * deltaTime * 5;
+
     // Check if intersects found before accessing the distance property
     if (intersects.length > 0) {
         let distanceToGround = intersects[0].distance;
-        groundLevel = kirby.position.y - distanceToGround + KIRBY_SIZE;
+        groundLevel = kirby.position.y - distanceToGround + KIRBY_SIZE/2;
     } else {
         groundLevel = -Infinity; // Kirby is over a void
     }
 
-    // Handle Jumping and gravity
-    if (isJumping) {
-        kirby.position.y += jumpVelocity * deltaTime * 20;
-        jumpVelocity += gravity * deltaTime * 20;
+    onGround = kirby.position.y - KIRBY_SIZE/2 <= groundLevel && yVelocity < 0;
+    if(onGround) {
+        kirby.position.y = groundLevel + KIRBY_SIZE/2;
+        yVelocity = 0;
+    }
 
-        // Implement logic when Kirby is above the void
-        if (kirby.position.y <= groundLevel || groundLevel === -Infinity) {
-            if (groundLevel !== -Infinity) {
-                kirby.position.y = groundLevel;
-                isJumping = false;
-                jumpVelocity = 0;
-            }
-        }
-        if (ceilingDetected && kirby.position.y >= ceilingLevel) {
-            kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
-            jumpVelocity = 0; // Stop upward movement
-        }
-    } else {
-        // Adjust for ground level changes
-        if (kirby.position.y > groundLevel && groundLevel !== -Infinity) {
-            kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
-        } else if (kirby.position.y < groundLevel) {
-            // Kirby can climb up slopes
-            kirby.position.y = groundLevel;
-        } else if (groundLevel === -Infinity) {
-            // Apply gravity if Kirby is over a void
-            kirby.position.y += gravity * deltaTime * 20;
-        } 
+    kirby.position.y += yVelocity;
+
+    if (ceilingDetected && kirby.position.y >= ceilingLevel) {
+        kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
+        yVelocity = 0; // Stop upward movement
     }
 }
 
