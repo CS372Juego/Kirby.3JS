@@ -104,13 +104,13 @@ function createAudio() {
     // Load sounds
     // https://downloads.khinsider.com/game-soundtracks/album/kirby-super-star-ultra
     const sounds = [
-        { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.8 }},
-        { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.3 }},
-        { name: 'clear', url: '../assets/audio/BGM/clear.mp3', options: { loop: false, volume: 0.3 }},
-        { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.5 }},
-        { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.3 }},
-        { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.4 }},
-        { name: 'finalWorld', url: '../assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.1 }}
+        { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
+        { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
+        { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
+        { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
+        { name: 'finalWorld', url: '../assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.2 }},
+        { name: 'clear', url: '../assets/audio/BGM/clear.mp3', options: { loop: false, volume: 0.5 }},
     ];
 
     Promise.all(sounds.map(sound => 
