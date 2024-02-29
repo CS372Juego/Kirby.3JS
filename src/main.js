@@ -8,11 +8,10 @@
 
 import * as THREE from 'three';
 import { ColladaLoader } from 'ColladaLoader';
-import { MMDLoader } from 'MMDLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { SoundManager } from './SoundManager.js';
 import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
-import { createWorld1, LAND_BEGIN_X, LAND_END_X } from '../world/world1.js';
+import { createWorld1, LAND_BEGIN_X } from '../world/world1.js';
 import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
@@ -22,11 +21,9 @@ let kirby, kirbyModel;
 let soundManager;
 let targetPosition;
 let isGameRunning = true;
-let walkingAnimationIndex = 2;
 let arrowUpPressed = false;
-let audioLoader, listener, audio;
 let hasPlayedClearSound = false;
-let canPlaySounds = true;
+let walkingAnimationIndex = 2;
 
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
@@ -49,7 +46,6 @@ const tpPosList = [
 ];
 
 const colladaLoader = new ColladaLoader();
-const mmdLoader = new MMDLoader();
 
 //=====< Set up the scene >=====//
 function createScene() {
@@ -124,16 +120,13 @@ function createAudio() {
 let lastWorld = '';
 function updateWorldMusic() {
     const newWorld = getCurrentWorld(kirby.position.x);
-
     if (newWorld !== lastWorld) {
         if (lastWorld) {
             setTimeout(() => soundManager.playSound(newWorld, true), 500);
         }
-
         setTimeout(() => {
             soundManager.playSound(newWorld, true);
         }, 500);
-        // soundManager.playSound(newWorld, true);
         lastWorld = newWorld;
     }
 }
@@ -158,7 +151,6 @@ function createLights() {
     dirLight1.shadow.camera.bottom = -100;
     dirLight1.shadow.camera.near = 1;
     dirLight1.shadow.camera.far = 500;
-
 
     // Set the resolution of the shadow map
     dirLight1.shadow.mapSize.width = 2048;
@@ -224,16 +216,17 @@ async function createKirby() {
         let material = new THREE.MeshPhongMaterial( {visible: false} );
         kirby = new THREE.Mesh(geometry, material);
 
-
+        // Default Starting Position
         kirby.position.set(WORLDS_OFFSET_X, 7, 0);
 
+        // Positions for debugging
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
         scene.add(kirby);
 
-        // Initialize targetPosition here
+        // Positions to go to
         targetPosition = {
             x: kirby.position.x,
             y: kirby.position.y,
@@ -241,7 +234,6 @@ async function createKirby() {
         };
 
         kirbyModel = new QuaterniusModel();
-        // New methods
         await kirbyModel.load('../assets/model/kirby.glb', Math.PI/2);
         kirbyModel.cueAnimation(0, true, 0);
 
@@ -308,7 +300,6 @@ window.addEventListener('keyup', (event) => {
     }
 });
 
-
 // Function to handle keyboard input
 const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
@@ -320,7 +311,7 @@ const gravity = -0.15;
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
-        // TODO: Maybe make a global variable for collision and only move kirby when there is no collision?
+        // TO DO: Maybe make a global variable for collision and only move kirby when there is no collision?
         targetPosition.z -= kirbySpeed * deltaTime * 100;
         direction.z -= baseKirbySpeed;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
@@ -445,7 +436,7 @@ function updateKirbyPosition(deltaTime) {
     }
 }
 
-//=====< Teleport Portals >=====//
+//=====< Teleport >=====//
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
         if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
@@ -470,7 +461,6 @@ function checkAndTeleportKirby() {
     }
 }
 
-
 function getCurrentWorld(kirbyX) {
     if (kirbyX >= worldStartBoundaries[0] && kirbyX <= worldStartBoundaries[1]) {
         return 'restingArea';
@@ -488,7 +478,6 @@ function getCurrentWorld(kirbyX) {
 //=====< Main Animation Loop >=====//
 function loop() {
     const deltaTime = clock.getDelta(); 
-
     if (!isGameRunning) { return; }
 
     let direction = {
@@ -542,6 +531,10 @@ window.onload = function() {
     });
 };
 
+function init(event) {
+    createScene();
+    runScene();
+}
 
 async function runScene() {
     createLights();
@@ -559,13 +552,8 @@ async function runScene() {
     loop();
 }
 
-function init(event) {
-    createScene();
-    runScene();
-}
-
 function fadeOutTitleScreen() {
-    var titleScreen = document.getElementById('titleScreen');
+    let titleScreen = document.getElementById('titleScreen');
     titleScreen.style.transition = "opacity 0.5s ease-out";
     titleScreen.style.opacity = 0;
     setTimeout(function() {
