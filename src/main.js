@@ -22,7 +22,9 @@ let soundManager;
 let targetPosition;
 let isGameRunning = true;
 let arrowUpPressed = false;
+let canPlaySounds = true;
 let hasPlayedClearSound = false;
+let isGameClear = false;
 let walkingAnimationIndex = 2;
 let kirbyHP = 100;
 
@@ -515,11 +517,23 @@ function updateHPBar(damage) {
 
 function gameOver() {
     soundManager.stopAllSounds();
-    isGameRunning = false;
+    if (!isGameClear) {
+        isGameRunning = false;
+    }
+    
+    document.getElementById('gameOverText').textContent = isGameClear ? "Game Clear" : "Game Over";
     setTimeout(() => {
-        soundManager.playSound('die');
-        document.getElementById('gameOverScreen').style.display = 'flex';
+        if (isGameClear) {
+            soundManager.playSound('clear');
+        } else {
+            soundManager.playSound('die');
+        }
     }, 500);
+
+    setTimeout(() => {
+        isGameRunning = false;
+        document.getElementById('gameOverScreen').style.display = 'flex';
+    }, 3000);
 }
 
 document.getElementById('retryButton').addEventListener('click', function() {
@@ -536,6 +550,7 @@ async function resetGame() {
     createAudio();
 
     hasPlayedClearSound = false;
+    isGameClear = false;
     kirby.position.set(WORLDS_OFFSET_X, 7, 0);
     targetPosition.x = WORLDS_OFFSET_X;
     targetPosition.y = 7;
@@ -588,9 +603,10 @@ function loop() {
     let distance = kirby.position.distanceTo(starPosition);
     if (distance <= 3 && !hasPlayedClearSound) {
         soundManager.stopAllSounds();
-        soundManager.playSound('clear');
         canPlaySounds = false;
-        hasPlayedClearSound = true; 
+        hasPlayedClearSound = true;
+        isGameClear = true;
+        gameOver();
     }
 
     if (isGameRunning) {
