@@ -412,6 +412,7 @@ function handleKeyboardInput(deltaTime, direction) {
         // jumpVelocity = jumpSpeed;
         yVelocity = jumpSpeed;
         soundManager.playSound('jump');
+        shakeHPBar();
     }
 
     // Boundary checks
@@ -613,6 +614,18 @@ function updateHPBar(damage) {
             soundManager.playSound('lowhp');
         }
     }
+}
+
+/**
+ * Shakes the HP bar element.
+ */
+function shakeHPBar() {
+    const hpBar = document.getElementById('hpContainer');
+    hpBar.classList.add('shake');
+
+    hpBar.addEventListener('animationend', () => {
+        hpBar.classList.remove('shake');
+    }, {once: true});
 }
 
 /**
