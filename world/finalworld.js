@@ -51,6 +51,8 @@ export async function createWorldF(scene) {
 
         const block = new THREE.Mesh(geometry, materials);
         block.position.set(x, y, z);
+        block.castShadow = true;
+        block.receiveShadow = true;
         world.add(block);
     });
 

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Colors } from '../src/color.js';
 import { Tree, loadTreeModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
@@ -52,6 +51,8 @@ export async function createWorldS(scene) {
         ];
 
         const block = new THREE.Mesh(geometry, materials);
+        block.castShadow = true;
+        block.receiveShadow = true;
         block.position.set(x, y, z);
         world.add(block);
     });

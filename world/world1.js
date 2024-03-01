@@ -63,6 +63,8 @@ export async function createWorld1(scene) {
         const block = new THREE.Mesh(geometry, materials);
         block.position.set(x, y, z);
         if (rotation) block.rotation.z = rotation;
+        block.castShadow = true;
+        block.receiveShadow = true;
         world1.add(block);
     });
 
