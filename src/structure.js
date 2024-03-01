@@ -4,9 +4,10 @@ import { OBJLoader } from 'OBJLoader';
 import { MTLLoader } from 'MTLLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 
-// Temporary tree from project5..
-// TO DO: Load model to the trunk (collision detection with trunk, but not leaves)
-// TO DO: bypass raycasting for model
+/**
+ * Represents a tree object.
+ * @class
+ */
 export class Tree {
     constructor() {
         this.mesh = new THREE.Object3D();
@@ -19,6 +20,10 @@ export class Tree {
     }
 }
 
+/**
+ * Loads a tree model asynchronously.
+ * @returns {Promise<QuaterniusModel>} A promise that resolves with the loaded tree model.
+ */
 export async function loadTreeModel() {
     const treeModel = new QuaterniusModel();
     await treeModel.load('../assets/model/tree.glb', Math.PI/2);
@@ -31,8 +36,10 @@ export async function loadTreeModel() {
     return treeModel;
 }
 
-// Temporary spikes..
-// To be replaced with a model
+/**
+ * Represents a Spikes object.
+ * @class
+ */
 export class Spikes {
     constructor() {
         this.mesh = new THREE.Object3D();
@@ -53,8 +60,10 @@ export class Spikes {
     }
 }
 
-// Temporary Star Boxes//
-// To be replaced with a model
+/**
+ * Represents a star box in the scene.
+ * @class
+ */
 export class StarBox {
     constructor() {
         this.mesh = new THREE.Object3D();
@@ -71,6 +80,10 @@ export class StarBox {
     }
 }
 
+/**
+ * Represents a star object in the scene.
+ * @class
+ */
 export class Star {
     constructor(){
         this.mesh = new THREE.Object3D();
@@ -83,6 +96,10 @@ export class Star {
     }
 }
 
+/**
+ * Loads the star model asynchronously.
+ * @returns {Promise<THREE.Object3D>} A promise that resolves with the loaded star model.
+ */
 export async function loadStarModel() {
     return new Promise((resolve, reject) => {
         const mtlLoader = new MTLLoader();

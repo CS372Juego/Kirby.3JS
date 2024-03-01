@@ -22,6 +22,11 @@ const blockDimensionsList = [
     { width: 10, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET, y: 20, z: 0 }
 ];
 
+/**
+ * Creates the world in the scene.
+ * @param {THREE.Scene} scene - The scene where the world will be added.
+ * @returns {Promise<void>} - A promise that resolves when the world is created.
+ */
 export async function createWorldF(scene) {
     let world = new THREE.Group();
 

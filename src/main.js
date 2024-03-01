@@ -71,6 +71,9 @@ const spikePosList = [
 const colladaLoader = new ColladaLoader();
 
 //=====< Set up the scene >=====//
+/**
+ * Creates the scene, camera, and renderer for the application.
+ */
 function createScene() {
     HEIGHT = window.innerHeight;
     WIDTH = window.innerWidth;
@@ -116,6 +119,9 @@ function handleWindowResize() {
 }
 
 //=====< Create Audio Files >=====//
+/**
+ * Creates audio and loads sounds using the SoundManager.
+ */
 function createAudio() {
     const listener = new THREE.AudioListener();
     camera.add(listener);
@@ -148,6 +154,9 @@ function createAudio() {
 }
 
 let lastWorld = '';
+/**
+ * Updates the world music based on the current position of Kirby.
+ */
 function updateWorldMusic() {
     const newWorld = getCurrentWorld(kirby.position.x);
     if (newWorld !== lastWorld) {
@@ -165,6 +174,9 @@ function updateWorldMusic() {
 
 //=====< Add the lights >=====//
 let hemisphereLight, dirLight1, dirLight2, ambientLight;
+/**
+ * Creates and adds lights to the scene.
+ */
 function createLights() {
     // gradient light: sky color - ground color - intensity
     hemisphereLight = new THREE.HemisphereLight(0xFFC0D9, 0x000000, 0.9)
@@ -197,6 +209,11 @@ function createLights() {
 }
 
 //=====< Add Background >=====//
+/**
+ * Creates a background using a loaded model.
+ * @returns {Promise<void>} A promise that resolves when the background is created.
+ * @throws {Error} If there is an error loading the model.
+ */
 async function createBackground() {
     try {
         // Wrap the loader in a promise
@@ -242,6 +259,13 @@ async function createBackground() {
 }
 
 //=======< Add Kirby >=====//
+/**
+ * Creates a Kirby object in the scene.
+ * @async
+ * @function createKirby
+ * @returns {Promise<void>} A promise that resolves when the Kirby object is created.
+ * @throws {Error} If there is an error loading the model.
+ */
 async function createKirby() {
     try {
         let geometry = new THREE.SphereGeometry(KIRBY_SIZE, 32, 32);
@@ -340,6 +364,11 @@ let yVelocity = 0;
 const jumpSpeed = 0.55;
 const gravity = 0.15;
 
+/**
+ * Handles keyboard input to control the movement of Kirby.
+ * @param {number} deltaTime - The time elapsed since the last frame.
+ * @param {object} direction - The direction vector of Kirby's movement.
+ */
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
@@ -387,6 +416,13 @@ function handleKeyboardInput(deltaTime, direction) {
 }
 
 // Smooth movement (Source: ChatGPT)
+/**
+ * Linearly interpolates between two values.
+ * @param {number} start - The starting value.
+ * @param {number} end - The ending value.
+ * @param {number} t - The interpolation factor (between 0 and 1).
+ * @returns {number} The interpolated value.
+ */
 function lerp(start, end, t) {
     return start * (1 - t) + end * t;
 }
@@ -394,6 +430,10 @@ function lerp(start, end, t) {
 let downVector = new THREE.Vector3(0, -1, 0);
 let groundLevel = null;
 
+/**
+ * Updates the position of Kirby based on the given deltaTime.
+ * @param {number} deltaTime - The time elapsed since the last update.
+ */
 function updateKirbyPosition(deltaTime) {
     // Determine the direction of movement
     let movementDirection = new THREE.Vector3(
@@ -456,6 +496,10 @@ function updateKirbyPosition(deltaTime) {
     }
 }
 
+/**
+ * Toggles the pause state of the game.
+ * @function togglePause
+ */
 function togglePause() {
     if (!enablePause) return;
     isPaused = !isPaused;
@@ -489,6 +533,9 @@ element.style.transition = "opacity 0.5s ease-out";
 }
 
 //=====< Teleport >=====//
+/**
+ * Checks if Kirby is close to any teleportation position and teleports Kirby accordingly.
+ */
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
         if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
@@ -516,6 +563,11 @@ function checkAndTeleportKirby() {
     }
 }
 
+/**
+ * Returns the current world based on the position of Kirby.
+ * @param {number} kirbyX - The x-coordinate of Kirby's position.
+ * @returns {string} The name of the current world.
+ */
 function getCurrentWorld(kirbyX) {
     if (kirbyX >= worldStartBoundaries[0] && kirbyX <= worldStartBoundaries[1]) {
         return 'restingArea';
@@ -531,6 +583,9 @@ function getCurrentWorld(kirbyX) {
 }
 
 //=====< Game Logic >=====//
+/**
+ * Checks for collision between Kirby and spikes, and updates the HP bar accordingly.
+ */
 function checkCollisionWithSpikes() {
     spikePosList.forEach(spikePos => {
         if (kirby.position.distanceTo(spikePos) < 5) {
@@ -539,6 +594,10 @@ function checkCollisionWithSpikes() {
     });
 }
 
+/**
+ * Updates the HP bar based on the damage taken by Kirby.
+ * @param {number} damage - The amount of damage taken by Kirby.
+ */
 function updateHPBar(damage) {
     if (damage > 0 && kirbyHP > 0) {
         soundManager.playSound('damage');
@@ -553,6 +612,11 @@ function updateHPBar(damage) {
     }
 }
 
+/**
+ * Ends the game and displays the game over screen.
+ * Stops all sounds, plays appropriate sound effects, and updates the game over text.
+ * If the game is cleared, it waits for a longer delay before showing the game over screen.
+ */
 function gameOver() {
     soundManager.stopAllSounds();
     if (!isGameClear) {
@@ -584,6 +648,10 @@ document.getElementById('retryButton').addEventListener('mouseenter', function()
     soundManager.playSound('select');
 });
 
+/**
+ * Resets the game state and starts a new game.
+ * @returns {Promise<void>} A promise that resolves once the game is reset.
+ */
 async function resetGame() {
     soundManager.stopAllSounds();
 
@@ -659,6 +727,11 @@ function loop() {
     }
 }
 
+/**
+ * Aligns the rotation of an object based on its velocity.
+ * @param {THREE.Object3D} obj - The object to align the rotation of.
+ * @param {THREE.Vector3} vel - The velocity of the object.
+ */
 function alignRotation(obj, vel) {
     if(vel.x != 0 || vel.z != 0) {
         const targetAngle = -Math.atan2(vel.z, vel.x);
@@ -698,6 +771,10 @@ async function runScene() {
     loop();
 }
 
+/**
+ * Fades out the title screen and displays the game container and health bar.
+ * Enables pause functionality.
+ */
 function fadeOutTitleScreen() {
     enablePause = true;
     let titleScreen = document.getElementById('titleScreen');
