@@ -323,6 +323,7 @@ async function createKirby() {
 //=====< Add Keyboard Interaction >=====//
 const keyState = {};
 window.addEventListener('keydown', (event) => {
+    keyState[event.code] = true;
     if (event.code === 'ArrowUp') {
         if (!arrowUpPressed) {
             // Allow only one keypress
@@ -331,35 +332,12 @@ window.addEventListener('keydown', (event) => {
             arrowUpPressed = true;
             checkAndTeleportKirby();
         }
-    } else {
-        keyState[event.code] = true;
-    }
-    if (event.shiftKey) {
-        kirbySpeed = baseKirbySpeed * 2; // Double the speed
-        walkingAnimationIndex = 1;
-        keyState[event.code] = true;
-    } else {
-        kirbySpeed = baseKirbySpeed; // Normal speed
-        walkingAnimationIndex = 2;
-        keyState[event.code] = true;
     }
 });
-
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
-    if (event.code === 'ArrowUp') {
-        arrowUpPressed = false;
-    }
-    kirbySpeed = baseKirbySpeed; // Reset speed
-    if (event.shiftKey) {
-        kirbyModel.cueAnimation(2, true, 0.3);
-    }
-    // Stop animation and reset to idle
-    if(kirbyModel.lastAnimation != 0) {
-        kirbyModel.stopAnimation(0.3);
-        kirbyModel.cueAnimation(0, true, 0.3);
-    }
-});
+    arrowUpPressed = !(event.code === 'ArrowUp');
+})
 
 // Function to handle keyboard input
 const baseKirbySpeed = 0.15;
@@ -376,6 +354,7 @@ const gravity = 0.15;
  */
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
+    let moving = false;
     if (keyState['KeyW']) {
         // TO DO: Maybe make a global variable for collision and only move kirby when there is no collision?
         targetPosition.z -= kirbySpeed * deltaTime * 100;
@@ -383,6 +362,7 @@ function handleKeyboardInput(deltaTime, direction) {
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
+        moving = true;
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
@@ -390,6 +370,7 @@ function handleKeyboardInput(deltaTime, direction) {
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
+        moving = true;
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
@@ -397,6 +378,7 @@ function handleKeyboardInput(deltaTime, direction) {
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
+        moving = true;
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
@@ -404,6 +386,7 @@ function handleKeyboardInput(deltaTime, direction) {
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
+        moving = true;
     }
     if (keyState['Space'] && onGround) {
         // I don't believe this has any noticeable effect and it causes the
@@ -415,6 +398,22 @@ function handleKeyboardInput(deltaTime, direction) {
         yVelocity = jumpSpeed;
         soundManager.playSound('jump');
         shakeHPBar();
+    }
+
+    // Reset to idle animation while not moving
+    if(!moving && kirbyModel.lastAnimation != 0) {
+        kirbyModel.stopAnimation(0.3);
+        kirbyModel.cueAnimation(0, true, 0.3);
+    }
+
+    // Start running if Shift is pressed
+    if(moving && (keyState['ShiftLeft'] || keyState['ShiftRight'])) {
+        kirbySpeed = baseKirbySpeed * 2;
+        walkingAnimationIndex = 1;
+    } else {
+        kirbySpeed = baseKirbySpeed;
+        walkingAnimationIndex = 2;
+        kirbyModel.cueAnimation(0, true, 0.3);
     }
 
     // Boundary checks
