@@ -201,18 +201,3 @@ export async function createWorld1(scene) {
     starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, 0);
     scene.add(starBox.mesh);
 }
-
-export function removeWorld1(scene) {
-    scene.traverse(object => {
-        if (object.geometry) {
-            object.geometry.dispose();
-        }
-        if (object.material) {
-            if (object.material.map) {
-                object.material.map.dispose();
-            }
-            object.material.dispose();
-        }
-    });
-    scene.remove(...scene.children);
-}

@@ -24,6 +24,7 @@ let isGameRunning = true;
 let arrowUpPressed = false;
 let hasPlayedClearSound = false;
 let walkingAnimationIndex = 2;
+let kirbyHP = 100;
 
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
@@ -43,6 +44,24 @@ const tpPosList = [
     [new THREE.Vector3(WORLDS_OFFSET_X + 30, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X - 80, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 40, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 95, 7, 0)]
+];
+
+const spikePosList = [
+    // world1
+    new THREE.Vector3(LAND_BEGIN_X + 60.5, 6, 0),
+    new THREE.Vector3(LAND_BEGIN_X + 66.5, 6, 0),
+    new THREE.Vector3(LAND_BEGIN_X + 60.5, 6, -5),
+    new THREE.Vector3(LAND_BEGIN_X + 66.5, 6, -5),
+    new THREE.Vector3(LAND_BEGIN_X + 60.5, 6, 5),
+    new THREE.Vector3(LAND_BEGIN_X + 66.5, 6, 5),
+
+    // world2
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 117.5, 61, 0),
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 122.5, 61, 0),
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 117.5, 61, -5),
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 122.5, 61, -5),
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 117.5, 61, 5),
+    new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X + 122.5, 61, 5),
 ];
 
 const colladaLoader = new ColladaLoader();
@@ -102,6 +121,9 @@ function createAudio() {
     const sounds = [
         { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
         { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'lowhp', url: '../assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
+        { name: 'die', url: '../assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
         { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
         { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
         { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
@@ -475,7 +497,68 @@ function getCurrentWorld(kirbyX) {
     }
 }
 
+//=====< Game Logic >=====//
+function checkCollisionWithSpikes() {
+    spikePosList.forEach(spikePos => {
+        if (kirby.position.distanceTo(spikePos) < 5) {
+            updateHPBar(20);
+        }
+    });
+}
+
+function updateHPBar(damage) {
+    if (damage > 0 && kirbyHP > 0) {
+        soundManager.playSound('damage');
+        kirbyHP = Math.max(0, kirbyHP - damage);
+        document.getElementById('hpBar').value = kirbyHP;
+
+        if (kirbyHP <= 0) {
+            gameOver();
+        } else if (kirbyHP <= 30 && kirbyHP > 0) {
+            soundManager.playSound('lowhp');
+        }
+    }
+}
+
+function gameOver() {
+    soundManager.stopAllSounds();
+    isGameRunning = false;
+    setTimeout(() => {
+        soundManager.playSound('die');
+        document.getElementById('gameOverScreen').style.display = 'flex';
+    }, 500);
+}
+
+document.getElementById('retryButton').addEventListener('click', function() {
+    resetGame();  
+});
+
+async function resetGame() {
+    soundManager.stopAllSounds();
+
+    isGameRunning = true;
+    kirbyHP = 100;
+    document.getElementById('hpBar').value = kirbyHP;
+
+    createAudio();
+
+    hasPlayedClearSound = false;
+    kirby.position.set(WORLDS_OFFSET_X, 7, 0);
+    targetPosition.x = WORLDS_OFFSET_X;
+    targetPosition.y = 7;
+    targetPosition.z = 0;
+    
+    document.getElementById('gameOverScreen').style.display = 'none';
+
+    setTimeout(() => {
+        soundManager.playSound('restingArea', true);
+    }, 1000);
+    loop();
+}
+
 //=====< Main Animation Loop >=====//
+let collisionCheckInterval = 500;
+let lastCollisionCheck = Date.now();
 function loop() {
     const deltaTime = clock.getDelta(); 
     if (!isGameRunning) { return; }
@@ -483,6 +566,12 @@ function loop() {
     let direction = {
         x: 0,
         z: 0,
+    }
+
+    let now = Date.now();
+    if(now - lastCollisionCheck > collisionCheckInterval) {
+        checkCollisionWithSpikes();
+        lastCollisionCheck = now;
     }
 
     handleKeyboardInput(deltaTime, direction);
@@ -510,8 +599,10 @@ function loop() {
         hasPlayedClearSound = true; 
     }
 
-    requestAnimationFrame(loop);
-    renderer.render(scene,camera)
+    if (isGameRunning) {
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
 }
 
 function alignRotation(obj, vel) {
@@ -528,6 +619,7 @@ window.onload = function() {
     document.getElementById('playButton').addEventListener('click', function() {
         init();
         fadeOutTitleScreen();
+        updateHPBar(0);
     });
 };
 
@@ -555,12 +647,18 @@ async function runScene() {
 function fadeOutTitleScreen() {
     let titleScreen = document.getElementById('titleScreen');
     let containerScreen = document.getElementById('container');
+    let hpBar = document.getElementById('hpContainer');
+
     titleScreen.style.transition = "opacity 0.5s ease-out";
     containerScreen.style.transition = "opacity 0.5s ease-out";
+    hpBar.style.transition = "opacity 0.5s ease-out";
+
     titleScreen.style.opacity = 0;
     containerScreen.style.opacity = 0;
+    hpBar.style.opacity = 1;
     setTimeout(function() {
         titleScreen.style.display = 'none';
         containerScreen.style.display = 'none';
+        hpBar.style.display = 'flex';
     }, 500);
 }

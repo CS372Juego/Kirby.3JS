@@ -6,83 +6,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
-  <style>
-    body { 
-      margin: 0; 
-      font-family: 'Fredoka';
-      overflow: hidden;
-      background: linear-gradient(#AEDEFC, #B6FFFA);
-    }
-
-    canvas { display: block; }
-
-    #container {
-      position: absolute;
-      display: flex;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #EEA5A6;
-    }
-
-    #titleScreen {
-      display: flex;
-      position: absolute;
-      top: 45%;
-      left: 50%;
-      width: 50%;
-      height: 50%;
-      transform: translate(-50%, -50%);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      background-color: rgba(253, 229, 236, 0.5);
-      padding: 40px;
-      border-radius: 100px;
-    }
-
-    #titleScreen div {
-      text-align: center;
-    }
-
-    #imgContainer {
-      width: 100%;
-      text-align: center;
-    }
-
-    #titleScreen img {
-      max-width: 75%;
-      height: auto;
-      margin-bottom: 20px;
-    }
-
-    #playButton {
-      border: none;
-        background-color: #FAF3F0;
-        transition: background-color 0.4s;
-        border-radius: 70px;
-        padding: 20px;
-        padding-left: 60px;
-        padding-right: 60px;
-        font-family: 'Fredoka';
-        font-size: 70px;
-        cursor: pointer;
-        margin-top: 30px;
-    }
-
-    #playButton:hover {
-      background-color: #F3D7CA;
-      transition: background-color 0.4s;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-  <!-- TO DO: Update titlescreen with better design (e.g. image) -->
   <div id="container">
     <div id="titleScreen">
       <div style="text-align: center;">
@@ -92,6 +18,16 @@
           <button id="playButton">Play</button>
       </div>
     </div>
+  </div>
+
+  <div id="gameOverScreen" style="display: none;">
+    <h1>Game Over</h1>
+    <button id="retryButton">Retry</button>
+  </div>
+
+  <div id="hpContainer">
+    <label for="hpBar">Kirby</label>
+    <progress id="hpBar" value="100" max="100"></progress>
   </div>
 
   <script type="importmap">

@@ -59,18 +59,3 @@ export async function createWorldS(scene) {
         tree.mesh.add(treeModel);
     });
 }
-
-export function removeWorldS(scene) {
-    scene.traverse(object => {
-        if (object.geometry) {
-            object.geometry.dispose();
-        }
-        if (object.material) {
-            if (object.material.map) {
-                object.material.map.dispose();
-            }
-            object.material.dispose();
-        }
-    });
-    scene.remove(...scene.children);
-}
