@@ -162,28 +162,28 @@ export async function createWorld1(scene) {
     scene.add(starBox.mesh);
     starBox = new StarBox();
 
-    starBox.mesh.position.set(LAND_BEGIN_X + 207, 12.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 11.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 212, 12.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 11.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X + 217, 11.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 207, 17.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 16.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 212, 17.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 16.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 207, 12.5-1.3, 0);
+    starBox.mesh.position.set(LAND_BEGIN_X + 207, 12.5, 0);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 212, 12.5-1.3, 0);
+    starBox.mesh.position.set(LAND_BEGIN_X + 212, 12.5, 0);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5-1.3, 0);
+    starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, 0);
     scene.add(starBox.mesh);
 
     //=====< Door >=====//

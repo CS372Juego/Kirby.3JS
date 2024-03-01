@@ -154,10 +154,10 @@ export async function createWorld2(scene) {
     starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 22.5, 7.5, 5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 210.5, 12.5-1.3, 5);
+    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 210.5, 11.5, 5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 210.5, 12.5-1.3, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 210.5, 11.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
     starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 272.5, 7.5, -5);

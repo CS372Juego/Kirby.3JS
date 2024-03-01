@@ -348,7 +348,7 @@ const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
 let onGround = true;
 let yVelocity = 0;
-const jumpSpeed = 1;
+const jumpSpeed = 0.55;
 const gravity = 0.15;
 
 /**
@@ -416,7 +416,6 @@ function handleKeyboardInput(deltaTime, direction) {
     } else {
         kirbySpeed = baseKirbySpeed;
         walkingAnimationIndex = 2;
-        kirbyModel.cueAnimation(0, true, 0.3);
     }
 
     // Boundary checks
