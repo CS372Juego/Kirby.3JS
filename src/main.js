@@ -552,6 +552,22 @@ function checkAndTeleportKirby() {
 }
 
 /**
+ * Increases the HP (Health Points) of Kirby by 5 until it reaches 100.
+ * Updates the HP bar element on the page accordingly.
+ * Stops the incrementation when Kirby's HP reaches 100.
+ */
+function incrementHP() {
+    if (kirbyHP < 100) {
+        kirbyHP += 5;
+        document.getElementById('hpBar').value = kirbyHP;
+        if (kirbyHP >= 100) {
+            clearInterval(hpIncrementInterval);
+            kirbyHP = 100;
+        }
+    }
+}
+
+/**
  * Teleports Kirby to the specified destination.
  * @param {Object} destination - The destination coordinates.
  * @param {number} destination.x - The x-coordinate of the destination.
@@ -573,13 +589,11 @@ function teleportKirby(destination, origin) {
 
     // Check if Kirby teleported to the resting area by comparing coordinates
     if (Math.abs(destination.x - WORLDS_OFFSET_X - 30) < 5 && kirbyHP < 100) {
-        kirbyHP = 100;
-        document.getElementById('hpBar').value = kirbyHP;
+        let hpIncrementInterval = setInterval(incrementHP, 50);
         soundManager.playSound('hpup');
         console.log('Teleported to resting area, HP restored.');
     }
 }
-
 
 /**
  * Returns the current world based on the position of Kirby.
