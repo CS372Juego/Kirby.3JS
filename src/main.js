@@ -560,6 +560,7 @@ function gameOver() {
         isGameRunning = false;
     }
     
+    let gameDelay = isGameClear ? 6000 : 3000;
     document.getElementById('gameOverText').textContent = isGameClear ? "Game Clear" : "Game Over";
     setTimeout(() => {
         if (isGameClear) {
@@ -572,7 +573,7 @@ function gameOver() {
     setTimeout(() => {
         isGameRunning = false;
         document.getElementById('gameOverScreen').style.display = 'flex';
-    }, 3000);
+    }, gameDelay);
 }
 
 document.getElementById('retryButton').addEventListener('click', function() {
