@@ -139,6 +139,7 @@ function createAudio() {
         { name: 'pause', url: '../assets/audio/SE/pause.wav', options: { loop: false, volume: 0.4 }},
         { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
         { name: 'lowhp', url: '../assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
+        { name: 'hpup', url: '../assets/audio/SE/hpup.wav', options: { loop: false, volume: 0.4 }},
         { name: 'die', url: '../assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
         { name: 'dead', url: '../assets/audio/SE/dead.wav', options: { loop: false, volume: 0.3 }},
         { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
@@ -538,34 +539,47 @@ element.style.transition = "opacity 0.5s ease-out";
 
 //=====< Teleport >=====//
 /**
- * Checks if Kirby is close to any teleportation position and teleports Kirby accordingly.
+ * Checks if Kirby is close to any teleportation positions and teleports Kirby accordingly.
  */
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
         if (kirby.position.distanceTo(posA) <= 5 && arrowUpPressed) {
-            soundManager.stopAllSounds();
-            soundManager.playSound('teleport');
-            kirby.position.set(posB.x, posB.y, posB.z);
-            targetPosition.x = posB.x;
-            targetPosition.y = posB.y;
-            targetPosition.z = posB.z;
-            updateWorldMusic();
-            return;
+            teleportKirby(posB, posA);
         } else if (kirby.position.distanceTo(posB) <= 5 && arrowUpPressed) {
-            soundManager.stopAllSounds();
-            soundManager.playSound('teleport');
-            kirby.position.set(posA.x, posA.y, posA.z);
-            targetPosition.x = posA.x;
-            targetPosition.y = posA.y;
-            targetPosition.z = posA.z;
-            updateWorldMusic();
-            return;
-        } else {
-            console.log('No teleportation available');
-            continue;
+            teleportKirby(posA, posB);
         }
     }
 }
+
+/**
+ * Teleports Kirby to the specified destination.
+ * @param {Object} destination - The destination coordinates.
+ * @param {number} destination.x - The x-coordinate of the destination.
+ * @param {number} destination.y - The y-coordinate of the destination.
+ * @param {number} destination.z - The z-coordinate of the destination.
+ * @param {Object} origin - The origin coordinates.
+ * @param {number} origin.x - The x-coordinate of the origin.
+ * @param {number} origin.y - The y-coordinate of the origin.
+ * @param {number} origin.z - The z-coordinate of the origin.
+ */
+function teleportKirby(destination, origin) {
+    soundManager.stopAllSounds();
+    soundManager.playSound('teleport');
+    kirby.position.set(destination.x, destination.y, destination.z);
+    targetPosition.x = destination.x;
+    targetPosition.y = destination.y;
+    targetPosition.z = destination.z;
+    updateWorldMusic();
+
+    // Check if Kirby teleported to the resting area by comparing coordinates
+    if (Math.abs(destination.x - WORLDS_OFFSET_X - 30) < 5 && kirbyHP < 100) {
+        kirbyHP = 100;
+        document.getElementById('hpBar').value = kirbyHP;
+        soundManager.playSound('hpup');
+        console.log('Teleported to resting area, HP restored.');
+    }
+}
+
 
 /**
  * Returns the current world based on the position of Kirby.
