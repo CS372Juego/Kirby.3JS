@@ -1,4 +1,4 @@
-# A-platformer (Kirby)
+# Kirby.3JS
 - Jason Chew, Daniel Kim
 - CS372 Final Project
 ------
