@@ -123,9 +123,11 @@ function createAudio() {
     const sounds = [
         { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
         { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
-        { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'select', url: '../assets/audio/SE/select.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
         { name: 'lowhp', url: '../assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
         { name: 'die', url: '../assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
+        { name: 'dead', url: '../assets/audio/SE/dead.wav', options: { loop: false, volume: 0.3 }},
         { name: 'restingArea', url: '../assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
         { name: 'world1', url: '../assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
         { name: 'world2', url: '../assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
@@ -518,6 +520,7 @@ function updateHPBar(damage) {
 function gameOver() {
     soundManager.stopAllSounds();
     if (!isGameClear) {
+        soundManager.playSound('dead');
         isGameRunning = false;
     }
     
@@ -538,6 +541,10 @@ function gameOver() {
 
 document.getElementById('retryButton').addEventListener('click', function() {
     resetGame();  
+});
+
+document.getElementById('retryButton').addEventListener('mouseenter', function() {
+    soundManager.playSound('select');
 });
 
 async function resetGame() {
