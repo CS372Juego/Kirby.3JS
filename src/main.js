@@ -30,6 +30,7 @@ let isPaused = false;
 let enablePause = false;
 let hasPlayedClearSound = false;
 let isGameClear = false;
+let canPlaySounds = true;
 let walkingAnimationIndex = 2;
 let kirbyHP = 100;
 let hpIncrementInterval;
