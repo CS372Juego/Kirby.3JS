@@ -172,7 +172,7 @@ export async function createEnemy2(scene) {
     const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false });
     const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
 
-    enemyCollider.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 50, 6.5, 0);
+    enemyCollider.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 40, 6.5, 0);
     enemyCollider.add(enemyModel);
     scene.add(enemyCollider);
     return enemyCollider;
