@@ -1,5 +1,6 @@
 # Kirby.3JS
 - Jason Chew, Daniel Kim
+- Spring 2024
 - CS372 Final Project
 ------
 ## How to Play
@@ -25,3 +26,6 @@
 - Performance
     - Optimization
     - Various Framerate Support
+
+------
+### PLEASE DON'T SUE US

@@ -160,7 +160,7 @@ export async function createWorld2(scene) {
     starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 210.5, 11.5, -5);
     scene.add(starBox.mesh);
     starBox = new StarBox();
-    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 272.5, 7.5, -5);
+    starBox.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 272.5, 7.5, -6);
     scene.add(starBox.mesh);
 
     //=====< Door >=====//
@@ -168,19 +168,33 @@ export async function createWorld2(scene) {
     doorModel.scale.set(2, 2, 2);
     doorModel.position.set(-4, -3, 24);
     doorModel.rotation.y = Math.PI/2;
-
     doorModel.traverse((child) => {
         if (child.isMesh) {
             child.raycast = function () {};
         }
     });
-
     const door = new Door();
     door.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X + 273, 6, 0);
     door.mesh.rotation.y = Math.PI/2;
     door.mesh.scale.set(0.5, 0.5, 0.5);
     scene.add(door.mesh);
     door.mesh.add(doorModel);
+
+    let anotherDoorModel = await loadDoorModel();
+    anotherDoorModel.scale.set(2, 2, 2);
+    anotherDoorModel.position.set(-4, -3, 24);
+    anotherDoorModel.rotation.y = Math.PI/2;
+    anotherDoorModel.traverse((child) => {
+        if (child.isMesh) {
+            child.raycast = function () {};
+        }
+    });
+    const anotherDoor = new Door();
+    anotherDoor.mesh.position.set(LAND_BEGIN_X2 + WORLD2_OFFSET_X-5.5, 6, 0);
+    anotherDoor.mesh.rotation.y = Math.PI/2;
+    anotherDoor.mesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(anotherDoor.mesh);
+    anotherDoor.mesh.add(anotherDoorModel);
 }
 
 export async function createEnemy2(scene) {

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Star, Door, loadTreeModel, loadStarModel } from '../src/structure.js';
+import { Tree, Star, Door, loadTreeModel, loadStarModel, loadDoorModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLDF_OFFSET_X = 580;
@@ -102,8 +102,20 @@ export async function createWorldF(scene) {
     });
     star.mesh.add(starModel);
 
-    //=====< Door >=====//
-    // let door = new Door();
-    // door.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 95, 0, 0);
-    // scene.add(door.mesh);
+    // =====< Door >=====//
+    let doorModel = await loadDoorModel();
+    doorModel.scale.set(2, 2, 2);
+    doorModel.position.set(-4, -3, 24);
+    doorModel.rotation.y = Math.PI/2;
+    doorModel.traverse((child) => {
+        if (child.isMesh) {
+            child.raycast = function () {};
+        }
+    });
+    let door = new Door();
+    door.mesh.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X-5.5, 6, 0);
+    door.mesh.rotation.y = Math.PI/2;
+    door.mesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(door.mesh);
+    door.mesh.add(doorModel);
 }
