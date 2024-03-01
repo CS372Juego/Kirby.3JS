@@ -23,6 +23,8 @@ let targetPosition;
 let isGameRunning = true;
 let arrowUpPressed = false;
 let canPlaySounds = true;
+let isPaused = false;
+let enablePause = false;
 let hasPlayedClearSound = false;
 let isGameClear = false;
 let walkingAnimationIndex = 2;
@@ -125,6 +127,7 @@ function createAudio() {
         { name: 'jump', url: '../assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
         { name: 'teleport', url: '../assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
         { name: 'select', url: '../assets/audio/SE/select.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'pause', url: '../assets/audio/SE/pause.wav', options: { loop: false, volume: 0.4 }},
         { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
         { name: 'lowhp', url: '../assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
         { name: 'die', url: '../assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
@@ -165,7 +168,7 @@ let hemisphereLight, dirLight1, dirLight2, ambientLight;
 function createLights() {
     // gradient light: sky color - ground color - intensity
     hemisphereLight = new THREE.HemisphereLight(0xFFC0D9, 0x000000, 0.9)
-    ambientLight = new THREE.AmbientLight(0xDCF2F1, 1);
+    ambientLight = new THREE.AmbientLight(0xDCF2F1, 2);
     dirLight1 = new THREE.DirectionalLight(0xDCF2F1, 0.9);
     dirLight1.position.set(0, 300, -100);
     dirLight1.castShadow = true;
@@ -453,6 +456,38 @@ function updateKirbyPosition(deltaTime) {
     }
 }
 
+function togglePause() {
+    if (!enablePause) return;
+    isPaused = !isPaused;
+    document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
+    
+    if (isPaused) {
+        fadeIn(document.getElementById('pauseScreen'));
+    } else {
+        fadeOut(document.getElementById('pauseScreen'));
+    }
+}
+
+window.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        togglePause();
+        soundManager.playSound('pause');
+    }
+});
+
+function fadeIn(element) {
+    element.style.transition = "opacity 0.5s ease-out";
+    element.style.opacity = 1;
+}
+
+function fadeOut(element) {
+element.style.transition = "opacity 0.5s ease-out";
+    element.style.opacity = 0;
+    setTimeout(() => {
+        element.style.display = 'none';
+    }, 500);
+}
+
 //=====< Teleport >=====//
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
@@ -663,6 +698,7 @@ async function runScene() {
 }
 
 function fadeOutTitleScreen() {
+    enablePause = true;
     let titleScreen = document.getElementById('titleScreen');
     let containerScreen = document.getElementById('container');
     let hpBar = document.getElementById('hpContainer');
