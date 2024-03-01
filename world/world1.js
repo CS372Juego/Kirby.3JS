@@ -1,98 +1,70 @@
 import * as THREE from 'three';
-import { Colors } from '../src/color.js';
 import { Tree, Spikes, StarBox, loadTreeModel } from '../src/structure.js';
 
+const LAND_WIDTH = 20;
 export const LAND_LENGTH = 300;
 export const LAND_OFFSET = 15;
 export const LAND_BEGIN_X = -LAND_LENGTH / 2 + LAND_OFFSET;
 export const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 
 // Global variables for reuse
-let geometry, plain;
-let material = new THREE.MeshPhongMaterial({ color: Colors.green });
-const LAND_WIDTH = 20;
+const loader = new THREE.TextureLoader();
+const textureTop = loader.load('../assets/texture/grass.png');
+const textureSides = loader.load('../assets/texture/darkdirt.png');
+
+textureTop.wrapS = textureTop.wrapT = THREE.RepeatWrapping;
+textureSides.wrapS = textureSides.wrapT = THREE.RepeatWrapping;
+
+const blockDimensionsList = [
+    { width: LAND_LENGTH, height: 10, depth: LAND_WIDTH, x: 0, y: 0, z: 0 },
+    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_BEGIN_X - LAND_OFFSET - 10, y: 20, z: 0 },
+    { width: 10, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 10.1, y: 3, z: 0 },
+    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 23.5, y: 3, z: 0, rotation: -Math.PI / 8 },
+    { width: 5, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 50, y: 5, z: 0 },
+    { width: 5, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 54.9, y: 5, z: 0 },
+    { width: 20, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 80, y: 5, z: 0 },
+    { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 110, y: 14, z: 0 },
+    { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 130, y: 14, z: 0 },
+    { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 14, z: 0 },
+    { width: 20, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 180, y: 5, z: 0 },
+    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 197, y: 6.4, z: 0, rotation: -Math.PI / 8 },
+    { width: 30, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 210, y: 3, z: 0 },
+    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 233, y: 3, z: 0, rotation: -Math.PI / 8 },
+    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET + 10, y: 20, z: 0}
+];
 
 export async function createWorld1(scene) {
     let world1 = new THREE.Group();
 
-    //=====< Level Structure >=====//
-    geometry = new THREE.BoxGeometry(LAND_LENGTH, 10, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(0, 0, 0);
-    world1.add(plain);
+    blockDimensionsList.forEach(({ width, height, depth, x, y, z, rotation }) => {
+        const repeatXT = width / 10;
+        const repeatZT = depth / 20;
+        const repeatXS = width / 20;
+        const repeatYS = height / 20;
 
-    geometry = new THREE.BoxGeometry(40, 50, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X-LAND_OFFSET-10, 20, 0);
-    world1.add(plain);
+        const topTexture = textureTop.clone();
+        topTexture.repeat.set(repeatXT, repeatZT);
+        topTexture.needsUpdate = true;
 
-    geometry = new THREE.BoxGeometry(10, 12, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X+10.1, 3, 0);
-    world1.add(plain);
+        const sideTexture = textureSides.clone();
+        sideTexture.repeat.set(repeatXS, repeatYS);
+        sideTexture.needsUpdate = true;
 
-    geometry = new THREE.BoxGeometry(20, 5, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 23.5, 3, 0);
-    plain.rotation.z = -Math.PI / 8;
-    world1.add(plain);
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+        const materials = [
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: topTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture })
+        ];
 
-    geometry = new THREE.BoxGeometry(5, 10, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 50, 5, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(5, 20, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 54.9, 5, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(20, 20, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 80, 5, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 110, 14, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 130, 14, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(10, 3, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 150, 14, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(20, 20, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 180, 5, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(20, 10, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 197, 6.4, 0);
-    plain.rotation.z = -Math.PI / 8;
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(30, 12, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 210, 3, 0);
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(20, 5, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X + 233, 3, 0);
-    plain.rotation.z = -Math.PI / 8;
-    world1.add(plain);
-
-    geometry = new THREE.BoxGeometry(40, 50, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_END_X+LAND_OFFSET + 10, 20, 0);
-    world1.add(plain);
+        const block = new THREE.Mesh(geometry, materials);
+        block.position.set(x, y, z);
+        if (rotation) block.rotation.z = rotation;
+        world1.add(block);
+    });
 
     scene.add(world1);
 

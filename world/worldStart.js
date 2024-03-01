@@ -11,27 +11,50 @@ const LAND_BEGIN_X = -LAND_LENGTH / 2 + LAND_OFFSET;
 const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 
 // Global variables for reuse
-// TO DO: Texture map the ground, and get shadows
-let geometry, plain;
-let material = new THREE.MeshPhongMaterial({ color: Colors.green });
+const loader = new THREE.TextureLoader();
+const textureTop = loader.load('../assets/texture/grass.png');
+const textureSides = loader.load('../assets/texture/darkdirt.png');
+
+textureTop.wrapS = textureTop.wrapT = THREE.RepeatWrapping;
+textureSides.wrapS = textureSides.wrapT = THREE.RepeatWrapping;
+
+const blockDimensionsList = [
+    { width: LAND_LENGTH, height: 10, depth: LAND_WIDTH, x: 0, y: 0, z: 0},
+    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_BEGIN_X-LAND_OFFSET-10, y: 20, z: 0},
+    { width: 10, height: 50, depth: LAND_WIDTH, x: LAND_END_X+LAND_OFFSET, y: 20, z: 0}
+];
 
 export async function createWorldS(scene) {
     let world = new THREE.Group();
 
-    geometry = new THREE.BoxGeometry(LAND_LENGTH, 10, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(0, 0, 0);
-    world.add(plain);
+    blockDimensionsList.forEach(({ width, height, depth, x, y, z }) => {
+        const repeatXT = width / 10;
+        const repeatZT = depth / 20;
+        const repeatXS = width / 20;
+        const repeatYS = height / 20;
 
-    geometry = new THREE.BoxGeometry(40, 50, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_BEGIN_X-LAND_OFFSET-10, 20, 0);
-    world.add(plain);
+        const topTexture = textureTop.clone();
+        topTexture.repeat.set(repeatXT, repeatZT);
+        topTexture.needsUpdate = true;
 
-    geometry = new THREE.BoxGeometry(10, 50, LAND_WIDTH);
-    plain = new THREE.Mesh(geometry, material);
-    plain.position.set(LAND_END_X+LAND_OFFSET, 20, 0);
-    world.add(plain);
+        const sideTexture = textureSides.clone();
+        sideTexture.repeat.set(repeatXS, repeatYS);
+        sideTexture.needsUpdate = true;
+
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+        const materials = [
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: topTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture }),
+            new THREE.MeshPhongMaterial({ map: sideTexture })
+        ];
+
+        const block = new THREE.Mesh(geometry, materials);
+        block.position.set(x, y, z);
+        world.add(block);
+    });
 
     world.position.x = WORLDS_OFFSET_X;
     scene.add(world);
