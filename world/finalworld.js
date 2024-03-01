@@ -17,9 +17,9 @@ textureTop.wrapS = textureTop.wrapT = THREE.RepeatWrapping;
 textureSides.wrapS = textureSides.wrapT = THREE.RepeatWrapping;
 
 const blockDimensionsList = [
-    { width: LAND_LENGTH, height: 10, depth: LAND_WIDTH, x: 0, y: 0, z: 0 },
-    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_BEGIN_X - LAND_OFFSET - 10, y: 20, z: 0 },
-    { width: 10, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET, y: 20, z: 0 }
+    { width: LAND_LENGTH-10, height: 50, depth: LAND_WIDTH, x: 2.5, y: -20, z: 0 },
+    { width: 40, height: 90, depth: LAND_WIDTH, x: LAND_BEGIN_X - LAND_OFFSET - 10, y: 0, z: 0 },
+    { width: 80, height: 90, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET + 30, y: 0, z: 0 }
 ];
 
 /**
