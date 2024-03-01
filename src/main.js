@@ -145,10 +145,12 @@ function updateWorldMusic() {
     if (newWorld !== lastWorld) {
         if (lastWorld) {
             setTimeout(() => soundManager.playSound(newWorld, true), 500);
+            console.log('Playing', newWorld, 'music')
+        } else {
+            setTimeout(() => {
+                soundManager.playSound(newWorld, true);
+            }, 500);
         }
-        setTimeout(() => {
-            soundManager.playSound(newWorld, true);
-        }, 500);
         lastWorld = newWorld;
     }
 }
@@ -456,7 +458,7 @@ function checkAndTeleportKirby() {
             targetPosition.x = posB.x;
             targetPosition.y = posB.y;
             targetPosition.z = posB.z;
-            updateWorldMusic(); // Update the music based on the new location
+            updateWorldMusic();
             return;
         } else if (kirby.position.distanceTo(posB) <= 5 && arrowUpPressed) {
             soundManager.stopAllSounds();
@@ -465,8 +467,11 @@ function checkAndTeleportKirby() {
             targetPosition.x = posA.x;
             targetPosition.y = posA.y;
             targetPosition.z = posA.z;
-            updateWorldMusic(); // Update the music based on the new location
+            updateWorldMusic();
             return;
+        } else {
+            console.log('No teleportation available');
+            continue;
         }
     }
 }
@@ -535,6 +540,7 @@ async function resetGame() {
     targetPosition.x = WORLDS_OFFSET_X;
     targetPosition.y = 7;
     targetPosition.z = 0;
+    lastWorld = '';
     
     document.getElementById('gameOverScreen').style.display = 'none';
 
