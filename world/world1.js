@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Spikes, StarBox, Door, loadTreeModel, loadGordoModel, loadDoorModel } from '../src/structure.js';
+import { Tree, Spikes, StarBox, Door, loadTreeModel, loadDoorModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const LAND_LENGTH = 300;

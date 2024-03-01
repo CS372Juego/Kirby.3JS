@@ -122,7 +122,7 @@ export async function loadStarModel() {
     });
 }
 
-export async function loadGordoModel() {
+function loadGordoModel() {
     return new Promise((resolve, reject) => {
         const mtlLoader = new MTLLoader();
         mtlLoader.load('../assets/model/gordo/DolGordo.mtl', (materials) => {
@@ -139,6 +139,28 @@ export async function loadGordoModel() {
                 resolve(obj);
             }, undefined, reject);
         });
+    });
+}
+
+export function createEnemy(x, y, z, leftBound, rightBound, scene) {
+    return loadGordoModel().then((gordoModel) => {
+        const enemyModel = gordoModel;
+
+        enemyModel.scale.set(0.4, 0.4, 0.4);
+        const enemyGeometry = new THREE.SphereGeometry(2, 32, 16);
+        const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false }); // Invisible
+        const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
+
+        enemyCollider.position.set(x, y, z);
+        enemyCollider.rotation.set(0, -Math.PI/6, 0);
+        enemyCollider.add(enemyModel);
+
+        // Set initial velocity direction
+        enemyCollider.userData = { direction: 1, leftBound: leftBound, rightBound: rightBound };
+        enemyCollider.layers.set(1); // Ignore during collision detection
+        scene.add(enemyCollider);
+
+        return enemyCollider;
     });
 }
 

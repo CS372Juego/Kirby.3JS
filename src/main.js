@@ -13,9 +13,10 @@ import * as THREE from 'three';
 import { ColladaLoader } from 'ColladaLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { SoundManager } from './SoundManager.js';
+import { createEnemy } from './structure.js';
 import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
-import { createWorld1, LAND_BEGIN_X, createEnemy } from '../world/world1.js';
-import { createWorld2, WORLD2_OFFSET_X, createEnemy2 } from '../world/world2.js';
+import { createWorld1, LAND_BEGIN_X } from '../world/world1.js';
+import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
@@ -25,7 +26,6 @@ let soundManager;
 let targetPosition;
 let isGameRunning = true;
 let arrowUpPressed = false;
-let canPlaySounds = true;
 let isPaused = false;
 let enablePause = false;
 let hasPlayedClearSound = false;
@@ -33,12 +33,9 @@ let isGameClear = false;
 let walkingAnimationIndex = 2;
 let kirbyHP = 100;
 let hpIncrementInterval;
-let enemy, enemy2;
-let enemyMoveDirection = 1;
-let enemy2MoveDirection = 1;
+let enemies = [];
 
-const enemySpeed = 0.01; 
-const enemy2Speed = 0.01;
+const ENEMY_SPEED = 0.01; 
 const KIRBY_SIZE = 2.7;
 const ENEMY_RADIUS = 2;
 const SMOOTHNESS = 0.05;
@@ -189,7 +186,7 @@ let hemisphereLight, dirLight1, dirLight2, ambientLight;
  * Creates and adds lights to the scene.
  */
 function createLights() {
-    // gradient light: sky color - ground color - intensity
+    // Gradient light: sky color - ground color - intensity
     hemisphereLight = new THREE.HemisphereLight(0xFFC0D9, 0x000000, 0.9)
     ambientLight = new THREE.AmbientLight(0xDCF2F1, 2);
     dirLight1 = new THREE.DirectionalLight(0xDCF2F1, 0.9);
@@ -340,6 +337,7 @@ window.addEventListener('keydown', (event) => {
     } else {
         keyState[event.code] = true;
     }
+    // Shift to run
     if (event.shiftKey) {
         kirbySpeed = baseKirbySpeed * 2; // Double the speed
         walkingAnimationIndex = 1;
@@ -383,7 +381,6 @@ const gravity = 0.15;
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     if (keyState['KeyW']) {
-        // TO DO: Maybe make a global variable for collision and only move kirby when there is no collision?
         targetPosition.z -= kirbySpeed * deltaTime * 100;
         direction.z -= baseKirbySpeed;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
@@ -498,6 +495,7 @@ function updateKirbyPosition(deltaTime) {
     if(onGround) {
         kirby.position.y = groundLevel + KIRBY_SIZE/2;
         yVelocity = 0;
+        console.log("floored");
     }
 
     kirby.position.y += yVelocity * deltaTime * 75;
@@ -728,18 +726,6 @@ async function resetGame() {
     
     document.getElementById('gameOverScreen').style.display = 'none';
 
-    if (enemy) {
-        scene.remove(enemy);
-        enemy = undefined;
-    }
-    enemy = await createEnemy(scene);
-
-    if (enemy2) {
-        scene.remove(enemy2);
-        enemy2 = undefined;
-    }
-    enemy2 = await createEnemy2(scene);
-
     setTimeout(() => {
         soundManager.playSound('restingArea', true);
     }, 1000);
@@ -747,36 +733,21 @@ async function resetGame() {
 }
 
 //=====< Enemy >=====//
-function updateEnemyPosition(deltaTime) {
+function updateEnemyPosition(enemy, speed, deltaTime) {
     if (!enemy) return;
-    enemy.position.x += enemySpeed * deltaTime * 1000 * enemyMoveDirection;
-
-    if (enemy.position.x > LAND_BEGIN_X + 163 || enemy.position.x < LAND_BEGIN_X + 126) {
-        enemyMoveDirection *= -1;
+    if (enemy.position.x < enemy.userData.leftBound) {
+        enemy.position.x = enemy.userData.leftBound;
+        enemy.userData.direction = 1;
+    } else if (enemy.position.x > enemy.userData.rightBound) {
+        enemy.position.x = enemy.userData.rightBound;
+        enemy.userData.direction = -1;
     }
+    enemy.position.x += speed * deltaTime * 1000 * enemy.userData.direction;
+    console.log(enemy.position.x);
 }
 
-function updateEnemy2Position(deltaTime) {
-    if (!enemy2) return;
-
-    enemy2.position.x += enemy2Speed * deltaTime * 1000 * enemy2MoveDirection;
-
-    if (enemy2.position.x > LAND_BEGIN_X + WORLD2_OFFSET_X + 85 || enemy2.position.x < LAND_BEGIN_X + WORLD2_OFFSET_X + 35) {
-        enemy2MoveDirection *= -1;
-    }
-}
-
-function checkCollisionWithEnemy() {
+function checkCollisionWithEnemy(enemy) {
     let distance = kirby.position.distanceTo(enemy.position);
-    let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
-    if (distance < sumOfRadii) {
-        return true;
-    }
-    return false;
-}
-
-function checkCollisionWithEnemy2() {
-    let distance = kirby.position.distanceTo(enemy2.position);
     let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
     if (distance < sumOfRadii) {
         return true;
@@ -791,32 +762,32 @@ function loop() {
     const deltaTime = clock.getDelta(); 
     if (!isGameRunning) { return; }
 
-    if (enemy) { 
-        if (enemy.position.x > LAND_BEGIN_X + 165 || enemy.position.x < LAND_BEGIN_X + 125) {
-            enemyMoveDirection *= -1;
-        }
-        enemy.position.x += enemySpeed * deltaTime * enemyMoveDirection;
-    }
-
     let direction = {
         x: 0,
         z: 0,
     }
 
     let now = Date.now();
+
+    // Check for spike or enemy collision
     if(now - lastCollisionCheck > collisionCheckInterval) {
         checkCollisionWithSpikes();
+        
+        for (let i=0; i < enemies.length; i++) {
+            if (checkCollisionWithEnemy(enemies[i])) {
+                updateHPBar(20);
+            }
+        }
         lastCollisionCheck = now;
     }
 
-    if (checkCollisionWithEnemy() || checkCollisionWithEnemy2()) {
-        updateHPBar(20);
+    for (let i=0; i < enemies.length; i++) {
+        updateEnemyPosition(enemies[i], ENEMY_SPEED, deltaTime);
     }
+
 
     handleKeyboardInput(deltaTime, direction);
     updateKirbyPosition(deltaTime);
-    updateEnemyPosition(deltaTime);
-    updateEnemy2Position(deltaTime);
     
     kirbyModel.advanceAnimation(deltaTime);
     alignRotation(kirbyModel, direction);
@@ -858,6 +829,7 @@ function alignRotation(obj, vel) {
         let targetRotation = new THREE.Quaternion();
         targetRotation.setFromEuler(new THREE.Euler(0, targetAngle, 0));
         obj.quaternion.rotateTowards(targetRotation, 0.1);
+        console.log(kirby.position);
     }
 }
 
@@ -885,11 +857,22 @@ async function runScene() {
     await createBackground();
     await createWorldS(scene);
     await createWorld1(scene);
-    enemy = await createEnemy(scene);
     await createWorld2(scene);
-    enemy2 = await createEnemy2(scene);
     await createWorldF(scene);
     await createKirby();
+    (async () => {
+        try {
+            // updateEnemyPosition(enemies[0], ENEMY_SPEED, 387, 403, deltaTime);
+            // updateEnemyPosition(enemies[1], ENEMY_SPEED, -63, -47, deltaTime);
+            let enemy = await createEnemy(400, 73, 0, 387, 403, scene);
+            enemies.push(enemy);
+
+            enemy = await createEnemy(-50, 17, 0, -63, -47, scene);
+            enemies.push(enemy);
+        } catch (error) {
+            console.error("Error loading model:", error);
+        }
+    })();
     loop();
 }
 
