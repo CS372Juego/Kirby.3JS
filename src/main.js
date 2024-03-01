@@ -26,8 +26,8 @@ let soundManager;
 let targetPosition;
 let isGameRunning = true;
 let arrowUpPressed = false;
-let isPaused = false;
-let enablePause = false;
+let helpShown = false;
+let onTitleScreen = false;
 let hasPlayedClearSound = false;
 let isGameClear = false;
 let canPlaySounds = true;
@@ -36,11 +36,18 @@ let kirbyHP = 100;
 let hpIncrementInterval;
 let enemies = [];
 
-const ENEMY_SPEED = 0.01; 
+// Kinematic variables
 const KIRBY_SIZE = 2.7;
+const BASE_KIRBY_SPEED = 0.15;
+const KIRBY_JUMP_SPEED = 0.55;
+const GRAVITY = 0.15;
+
+const ENEMY_SPEED = 0.01; 
 const ENEMY_RADIUS = 2;
+
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.04;
+
 const LAND_BEGIN = 5;
 const LAND_END = -5;
 const clock = new THREE.Clock();
@@ -52,12 +59,14 @@ const world2Boundaries = [LAND_BEGIN_X + WORLD2_OFFSET_X - 5, LAND_BEGIN_X + WOR
 const finalWorldBoundaries = [LAND_BEGIN_X + WORLDF_OFFSET_X + 90, LAND_BEGIN_X + WORLDF_OFFSET_X + 175];
 const starPosition = new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 135, 10, -5);
 
+// Stage starting points
 const tpPosList = [
     [new THREE.Vector3(WORLDS_OFFSET_X + 30, 7, 0), new THREE.Vector3(LAND_BEGIN_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X - 80, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0)],
     [new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 40, 7, 0), new THREE.Vector3(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0)]
 ];
 
+// Spike "danger zones" to damage Kirby
 const spikePosList = [
     // world1
     new THREE.Vector3(LAND_BEGIN_X + 60.5, 6, 0),
@@ -170,14 +179,9 @@ let lastWorld = '';
 function updateWorldMusic() {
     const newWorld = getCurrentWorld(kirby.position.x);
     if (newWorld !== lastWorld) {
-        if (lastWorld) {
-            setTimeout(() => soundManager.playSound(newWorld, true), 500);
-            console.log('Playing', newWorld, 'music')
-        } else {
-            setTimeout(() => {
-                soundManager.playSound(newWorld, true);
-            }, 500);
-        }
+        setTimeout(() => {
+            soundManager.playSound(newWorld, true);
+        }, 500);
         lastWorld = newWorld;
     }
 }
@@ -200,7 +204,7 @@ function createLights() {
 
     // Set the direction of the light
     dirLight1.shadow.camera.left = -650;
-    dirLight1.shadow.camera.right = 300; // RIGHT HERE
+    dirLight1.shadow.camera.right = 300;
     dirLight1.shadow.camera.top = 100;
     dirLight1.shadow.camera.bottom = -100;
     dirLight1.shadow.camera.near = 1;
@@ -301,6 +305,8 @@ async function createKirby() {
 
         kirbyModel = new QuaterniusModel();
         await kirbyModel.load('../assets/model/kirby.glb', Math.PI/2);
+
+        // Cue idle animation to start
         kirbyModel.cueAnimation(0, true, 0);
 
         // Inherits THREE.Object3D() methods
@@ -309,16 +315,11 @@ async function createKirby() {
         kirbyModel.traverse((child) => {
             if (child.isMesh) {
                 child.raycast = function () {};
-            }
-        });
-
-        // Enable shadows
-        kirbyModel.traverse((child) => {
-            if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
         });
+
         kirby.add(kirbyModel);
     } catch (error) {
         console.error("Error loading model:", error);
@@ -339,18 +340,16 @@ window.addEventListener('keydown', (event) => {
         }
     }
 });
+
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
     arrowUpPressed = false;
 })
 
-// Function to handle keyboard input
-const baseKirbySpeed = 0.15;
-let kirbySpeed = baseKirbySpeed;
+// Variables describing Kirby's current motion
+let kirbySpeed = BASE_KIRBY_SPEED;
 let onGround = true;
 let yVelocity = 0;
-const jumpSpeed = 0.55;
-const gravity = 0.15;
 
 /**
  * Handles keyboard input to control the movement of Kirby.
@@ -360,9 +359,10 @@ const gravity = 0.15;
 function handleKeyboardInput(deltaTime, direction) {
     if (!kirby) return;
     let moving = false;
+
     if (keyState['KeyW']) {
         targetPosition.z -= kirbySpeed * deltaTime * 100;
-        direction.z -= baseKirbySpeed;
+        direction.z -= BASE_KIRBY_SPEED;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
@@ -370,7 +370,7 @@ function handleKeyboardInput(deltaTime, direction) {
     }
     if (keyState['KeyS']) {
         targetPosition.z += kirbySpeed * deltaTime * 100;
-        direction.z += baseKirbySpeed;
+        direction.z += BASE_KIRBY_SPEED;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
@@ -378,7 +378,7 @@ function handleKeyboardInput(deltaTime, direction) {
     }
     if (keyState['KeyA']) {
         targetPosition.x -= kirbySpeed * deltaTime * 100;
-        direction.x -= baseKirbySpeed;
+        direction.x -= BASE_KIRBY_SPEED;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
@@ -386,20 +386,15 @@ function handleKeyboardInput(deltaTime, direction) {
     }
     if (keyState['KeyD']) {
         targetPosition.x += kirbySpeed * deltaTime * 100;
-        direction.x += baseKirbySpeed;
+        direction.x += BASE_KIRBY_SPEED;
         if(kirbyModel.lastAnimation != walkingAnimationIndex) {
             kirbyModel.cueAnimation(walkingAnimationIndex, true, 0.2);
         }
         moving = true;
     }
     if (keyState['Space'] && onGround) {
-        // I don't believe this has any noticeable effect and it causes the
-        // idle animation to not loop if you just jump without moving, so I
-        // have commented it out for now. 
-        // kirbyModel.cueAnimation(0, true, 0.3);
         onGround = false;
-        // jumpVelocity = jumpSpeed;
-        yVelocity = jumpSpeed;
+        yVelocity = KIRBY_JUMP_SPEED;
         soundManager.playSound('jump');
         shakeHPBar();
     }
@@ -410,12 +405,12 @@ function handleKeyboardInput(deltaTime, direction) {
         kirbyModel.cueAnimation(0, true, 0.3);
     }
 
-    // Start running if Shift is pressed
+    // Set run animation if Shift is pressed, walk otherwise
     if(moving && (keyState['ShiftLeft'] || keyState['ShiftRight'])) {
-        kirbySpeed = baseKirbySpeed * 2;
+        kirbySpeed = BASE_KIRBY_SPEED * 2;
         walkingAnimationIndex = 1;
     } else {
-        kirbySpeed = baseKirbySpeed;
+        kirbySpeed = BASE_KIRBY_SPEED;
         walkingAnimationIndex = 2;
     }
 
@@ -450,10 +445,9 @@ function updateKirbyPosition(deltaTime) {
         targetPosition.z - kirby.position.z
     ).normalize();
 
-    // Cast a ray upwards from Kirby's position to detect ceilings
+    // Raycast upwards to find the ceiling
     let ceilingRaycaster = new THREE.Raycaster(kirby.position, new THREE.Vector3(0, 1, 0), 0, 10);
     let ceilingIntersects = ceilingRaycaster.intersectObjects(scene.children, true);
-
     let ceilingDetected = ceilingIntersects.length > 0;
     let ceilingLevel = null;
 
@@ -468,6 +462,7 @@ function updateKirbyPosition(deltaTime) {
 
     let wallDetected = wallIntersects.length > 0;
 
+    // A posteriori collision detection technique
     if (wallDetected) {
         targetPosition.x = kirby.position.x;
         targetPosition.z = kirby.position.z;
@@ -480,7 +475,7 @@ function updateKirbyPosition(deltaTime) {
     let groundRaycaster = new THREE.Raycaster(kirby.position, downVector);
     let intersects = groundRaycaster.intersectObjects(scene.children, true);
 
-    yVelocity -= gravity * deltaTime * 5;
+    yVelocity -= GRAVITY * deltaTime * 5;
 
     // Check if intersects found before accessing the distance property
     if (intersects.length > 0) {
@@ -490,12 +485,14 @@ function updateKirbyPosition(deltaTime) {
         groundLevel = -Infinity; // Kirby is over a void
     }
 
+    // Set Kirby's y-vel to 0 on ground (he shouldn't fall through the floor)
     onGround = kirby.position.y - KIRBY_SIZE/2 <= groundLevel && yVelocity < 0;
     if(onGround) {
         kirby.position.y = groundLevel + KIRBY_SIZE/2;
         yVelocity = 0;
     }
 
+    // Update Kirby's y-position as appropriate given his yVelocity
     kirby.position.y += yVelocity * deltaTime * 75;
 
     if (ceilingDetected && kirby.position.y >= ceilingLevel) {
@@ -505,24 +502,25 @@ function updateKirbyPosition(deltaTime) {
 }
 
 /**
- * Toggles the pause state of the game.
- * @function togglePause
+ * Toggles the game's help screen
+ * @function toggleHelp
  */
-function togglePause() {
-    if (!enablePause) return;
-    isPaused = !isPaused;
-    document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
+function toggleHelp() {
+    if (!onTitleScreen) return;
+    helpShown = !helpShown;
+    document.getElementById('pauseScreen').style.display = helpShown ? 'flex' : 'none';
     
-    if (isPaused) {
+    if (helpShown) {
         fadeIn(document.getElementById('pauseScreen'));
     } else {
         fadeOut(document.getElementById('pauseScreen'));
     }
 }
 
+// Button for help screen
 window.addEventListener('keydown', function(event) {
     if (event.key === "Escape") {
-        togglePause();
+        toggleHelp();
         soundManager.playSound('pause');
     }
 });
@@ -542,7 +540,7 @@ element.style.transition = "opacity 0.5s ease-out";
 
 //=====< Teleport >=====//
 /**
- * Checks if Kirby is close to any teleportation positions and teleports Kirby accordingly.
+ * Checks if the player is attempting to teleport at a valid location.
  */
 function checkAndTeleportKirby() {
     for (const [posA, posB] of tpPosList) {
@@ -571,17 +569,11 @@ function incrementHP() {
 }
 
 /**
- * Teleports Kirby to the specified destination.
- * @param {Object} destination - The destination coordinates.
- * @param {number} destination.x - The x-coordinate of the destination.
- * @param {number} destination.y - The y-coordinate of the destination.
- * @param {number} destination.z - The z-coordinate of the destination.
- * @param {Object} origin - The origin coordinates.
- * @param {number} origin.x - The x-coordinate of the origin.
- * @param {number} origin.y - The y-coordinate of the origin.
- * @param {number} origin.z - The z-coordinate of the origin.
+ * Teleports Kirby to the specified destination, updating music and HP as
+ * needed.
+ * @param {Object} destination - The destination coordinates, a vector.
  */
-function teleportKirby(destination, origin) {
+function teleportKirby(destination) {
     soundManager.stopAllSounds();
     soundManager.playSound('teleport');
     kirby.position.set(destination.x, destination.y, destination.z);
@@ -646,7 +638,7 @@ function updateHPBar(damage) {
         document.getElementById('hpBar').value = kirbyHP;
 
         if (kirbyHP <= 0) {
-            gameOver();
+            restart();
         } else if (kirbyHP <= 30 && kirbyHP > 0) {
             soundManager.playSound('lowhp');
         }
@@ -666,11 +658,11 @@ function shakeHPBar() {
 }
 
 /**
- * Ends the game and displays the game over screen.
- * Stops all sounds, plays appropriate sound effects, and updates the game over text.
- * If the game is cleared, it waits for a longer delay before showing the game over screen.
+ * Ends the game and displays the ending screen.
+ * Stops all sounds, plays appropriate sound effects, and updates the ending text.
+ * If the game is cleared, it waits for a longer delay before showing the ending screen.
  */
-function gameOver() {
+function restart() {
     soundManager.stopAllSounds();
     if (!isGameClear) {
         soundManager.playSound('dead');
@@ -739,6 +731,8 @@ async function resetGame() {
  */
 function updateEnemyPosition(enemy, speed, deltaTime) {
     if (!enemy) return;
+
+    // "A posteriori" boundary detection to alternate direction of motion
     if (enemy.position.x < enemy.userData.leftBound) {
         enemy.position.x = enemy.userData.leftBound;
         enemy.userData.direction = 1;
@@ -793,7 +787,6 @@ function loop() {
         updateEnemyPosition(enemies[i], ENEMY_SPEED, deltaTime);
     }
 
-
     handleKeyboardInput(deltaTime, direction);
     updateKirbyPosition(deltaTime);
     
@@ -805,12 +798,12 @@ function loop() {
     camera.position.y = lerp(camera.position.y, kirby.position.y + 12, CAMERA_SMOOTHNESS);
     camera.position.z = lerp(camera.position.z, kirby.position.z + 32, CAMERA_SMOOTHNESS);
 
-    // Camera for construction
+    // Camera for debug
     // camera.position.x = lerp(camera.position.x, kirby.position.x, CAMERA_SMOOTHNESS);
     // camera.position.y = lerp(camera.position.y, kirby.position.y + 50, CAMERA_SMOOTHNESS);
     // camera.position.z = lerp(camera.position.z, kirby.position.z + 200, CAMERA_SMOOTHNESS);
     
-    // Play clear sound when kirby got the star
+    // Play clear sound when Kirby gets the star
     let distance = kirby.position.distanceTo(starPosition);
     if (distance <= 3 && !hasPlayedClearSound) {
         soundManager.stopAllSounds();
@@ -820,7 +813,7 @@ function loop() {
         setTimeout(() => {
             soundManager.playSound('getStar');
         }, 100);
-        gameOver();
+        restart();
     }
 
     if (isGameRunning) {
@@ -830,7 +823,8 @@ function loop() {
 }
 
 /**
- * Aligns the rotation of an object based on its velocity.
+ * Step the rotation of an object towards the direction of its vector of
+ * motion.
  * @param {THREE.Object3D} obj - The object to align the rotation of.
  * @param {THREE.Vector3} vel - The velocity of the object.
  */
@@ -871,10 +865,10 @@ async function runScene() {
     await createWorld2(scene);
     await createWorldF(scene);
     await createKirby();
+
+    // Initialize enemies at given positions with given "patrol" boundaries.
     (async () => {
         try {
-            // updateEnemyPosition(enemies[0], ENEMY_SPEED, 387, 403, deltaTime);
-            // updateEnemyPosition(enemies[1], ENEMY_SPEED, -63, -47, deltaTime);
             let enemy = await createEnemy(400, 73, 0, 387, 403, scene);
             enemies.push(enemy);
 
@@ -904,7 +898,7 @@ async function runScene() {
  * Enables pause functionality.
  */
 function fadeOutTitleScreen() {
-    enablePause = true;
+    onTitleScreen = true;
     let titleScreen = document.getElementById('titleScreen');
     let containerScreen = document.getElementById('container');
     let hpBar = document.getElementById('hpContainer');
