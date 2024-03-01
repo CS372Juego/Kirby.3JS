@@ -336,7 +336,7 @@ window.addEventListener('keydown', (event) => {
 });
 window.addEventListener('keyup', (event) => {
     keyState[event.code] = false;
-    arrowUpPressed = !(event.code === 'ArrowUp');
+    arrowUpPressed = false;
 })
 
 // Function to handle keyboard input
