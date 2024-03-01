@@ -167,12 +167,12 @@ export async function createWorld2(scene) {
 export async function createEnemy2(scene) {
     const enemyModel = await loadLeaperModel();
     
-    enemyModel.scale.set(1.5, 1.5, 1.5);
+    enemyModel.scale.set(1.1, 1.1, 1.1);
     const enemyGeometry = new THREE.SphereGeometry(2, 32, 16);
     const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false });
     const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
 
-    enemyCollider.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 50, 7.5, 0);
+    enemyCollider.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 50, 6.5, 0);
     enemyCollider.add(enemyModel);
     scene.add(enemyCollider);
     return enemyCollider;

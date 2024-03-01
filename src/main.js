@@ -761,7 +761,7 @@ function updateEnemy2Position(deltaTime) {
 
     enemy2.position.x += enemy2Speed * deltaTime * 1000 * enemy2MoveDirection;
 
-    if (enemy2.position.x > LAND_BEGIN_X + WORLD2_OFFSET_X + 85 || enemy2.position.x < LAND_BEGIN_X + WORLD2_OFFSET_X + 45) {
+    if (enemy2.position.x > LAND_BEGIN_X + WORLD2_OFFSET_X + 85 || enemy2.position.x < LAND_BEGIN_X + WORLD2_OFFSET_X + 35) {
         enemy2MoveDirection *= -1;
     }
 }
