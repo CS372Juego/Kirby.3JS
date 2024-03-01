@@ -288,7 +288,7 @@ async function createKirby() {
         // Positions for debugging
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-        kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+        // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
         scene.add(kirby);
 
@@ -840,7 +840,7 @@ function alignRotation(obj, vel) {
         let targetRotation = new THREE.Quaternion();
         targetRotation.setFromEuler(new THREE.Euler(0, targetAngle, 0));
         obj.quaternion.rotateTowards(targetRotation, 0.1);
-        // console.log(kirby.position);
+        console.log(kirby.position);
     }
 }
 
@@ -879,6 +879,18 @@ async function runScene() {
             enemies.push(enemy);
 
             enemy = await createEnemy(-50, 17, 0, -63, -47, scene);
+            enemies.push(enemy);
+
+            enemy = await createEnemy(300, 68, 0, 292, 317, scene);
+            enemies.push(enemy);
+
+            enemy = await createEnemy(220, 22, 2, 212, 262, scene);
+            enemies.push(enemy);
+
+            enemy = await createEnemy(-8, 7, 0, -9, 27, scene);
+            enemies.push(enemy);
+
+            enemy = await createEnemy(-25, 7, 0, -37, -19, scene);
             enemies.push(enemy);
         } catch (error) {
             console.error("Error loading model:", error);
