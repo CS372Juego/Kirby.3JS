@@ -2,19 +2,17 @@
 - Jason Chew, Daniel Kim
 - CS372 Final Project
 ------
+## How to Play
+- WASD
+- Space: Jump
+- Shift + WASD: Sprint
+- Click [here](https://students.cs.calvin.edu/~jk254/372/proj6/) to play!
+
+------
 ### TO DO
 - Game Logic
-    - HP Bar
-    - Gameover
     - Lives
     - Items (HP/Heal)
     - Enemy
 - Aesthetics
     - Better Lighting & Shadow
-    - Shadow
-    - Better Title Screen
-    - Gameover Screen
-    - Ground Texture Mapping
-- Physics
-    - Better collision detection
-    - Better gravity implementation
