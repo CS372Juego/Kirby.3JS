@@ -305,7 +305,7 @@ const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
 let onGround = true;
 let yVelocity = 0;
-const jumpSpeed = 0.75;
+const jumpSpeed = 0.55;
 const gravity = 0.15;
 
 function handleKeyboardInput(deltaTime, direction) {
@@ -416,7 +416,7 @@ function updateKirbyPosition(deltaTime) {
         yVelocity = 0;
     }
 
-    kirby.position.y += yVelocity;
+    kirby.position.y += yVelocity * deltaTime * 75;
 
     if (ceilingDetected && kirby.position.y >= ceilingLevel) {
         kirby.position.y = lerp(kirby.position.y, groundLevel, SMOOTHNESS * deltaTime * 100);
