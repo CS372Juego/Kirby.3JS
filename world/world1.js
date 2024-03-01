@@ -16,21 +16,21 @@ textureTop.wrapS = textureTop.wrapT = THREE.RepeatWrapping;
 textureSides.wrapS = textureSides.wrapT = THREE.RepeatWrapping;
 
 const blockDimensionsList = [
-    { width: LAND_LENGTH, height: 10, depth: LAND_WIDTH, x: 0, y: 0, z: 0 },
+    { width: LAND_LENGTH, height: 10, depth: LAND_WIDTH, x: 0, y: 0, z: 0.01 },
     { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_BEGIN_X - LAND_OFFSET - 10, y: 20, z: 0 },
-    { width: 10, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 10.1, y: 3, z: 0 },
-    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 23.5, y: 3, z: 0, rotation: -Math.PI / 8 },
+    { width: 10, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 10.1, y: 3, z: 0.01, zPriority: -1 },
+    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 23.5, y: 3, z: 0, rotation: -Math.PI / 8, zPriority: -1 },
     { width: 5, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 50, y: 5, z: 0 },
     { width: 5, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 54.9, y: 5, z: 0 },
     { width: 20, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 80, y: 5, z: 0 },
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 110, y: 14, z: 0 },
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 130, y: 14, z: 0 },
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 14, z: 0 },
-    { width: 20, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 180, y: 5, z: 0 },
-    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 197, y: 6.4, z: 0, rotation: -Math.PI / 8 },
-    { width: 30, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 210, y: 3, z: 0 },
-    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 233, y: 3, z: 0, rotation: -Math.PI / 8 },
-    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET + 10, y: 20, z: 0}
+    { width: 20, height: 20, depth: LAND_WIDTH, x: LAND_BEGIN_X + 180, y: 5, z: 0, zPriority: 0 },
+    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 197, y: 6.4, z: 0, rotation: -Math.PI / 8, zPriority: -1 },
+    { width: 30, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 210, y: 3, z: 0, zPriority: -2 },
+    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 233, y: 3, z: 0, rotation: -Math.PI / 8, zPriority: -1 },
+    { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET + 10, y: 20, z: 0.01}
 ];
 
 /**
@@ -42,11 +42,15 @@ const blockDimensionsList = [
 export async function createWorld1(scene) {
     let world1 = new THREE.Group();
 
-    blockDimensionsList.forEach(({ width, height, depth, x, y, z, rotation }) => {
+    blockDimensionsList.forEach(({ width, height, depth, x, y, z, rotation, zPriority }) => {
         const repeatXT = width / 10;
         const repeatZT = depth / 20;
         const repeatXS = width / 20;
         const repeatYS = height / 20;
+
+        if(zPriority === undefined) {
+            zPriority = 0;
+        }
 
         const topTexture = textureTop.clone();
         topTexture.repeat.set(repeatXT, repeatZT);
@@ -71,6 +75,7 @@ export async function createWorld1(scene) {
         if (rotation) block.rotation.z = rotation;
         block.castShadow = true;
         block.receiveShadow = true;
+        block.position.z += zPriority*0.005;
         world1.add(block);
     });
 

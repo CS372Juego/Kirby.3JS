@@ -32,13 +32,13 @@ const blockDimensionsList = [
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 44, z: 0 },
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 165, y: 34, z: 0 },
     { width: 10, height: 3, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 24, z: 0 },
-    { width: 10, height: 15, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 10, z: 0 },
+    { width: 10, height: 15, depth: LAND_WIDTH, x: LAND_BEGIN_X + 150, y: 10, z: 0, zPriority: -1 },
     { width: 20, height: 50, depth: LAND_WIDTH, x: LAND_BEGIN_X + 180, y: 45, z: 0 },
-    { width: 30, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 170, y: 7, z: 0 },
-    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 182, y: 6.4, z: 0, rotation: Math.PI / 8 },
-    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 197, y: 6.4, z: 0, rotation: -Math.PI / 8 },
-    { width: 30, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 210, y: 3, z: 0 },
-    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 233, y: 3, z: 0, rotation: -Math.PI / 8 },
+    { width: 30, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 170, y: 7, z: 0, zPriority: -4 },
+    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 182, y: 6.4, z: 0, rotation: Math.PI / 8, zPriority: -3 },
+    { width: 20, height: 10, depth: LAND_WIDTH, x: LAND_BEGIN_X + 197, y: 6.4, z: 0, rotation: -Math.PI / 8, zPriority: -2 },
+    { width: 30, height: 12, depth: LAND_WIDTH, x: LAND_BEGIN_X + 210, y: 3, z: 0, zPriority: -3 },
+    { width: 20, height: 5, depth: LAND_WIDTH, x: LAND_BEGIN_X + 233, y: 3, z: 0, rotation: -Math.PI / 8, zPriority: -4 },
     { width: 40, height: 50, depth: LAND_WIDTH, x: LAND_END_X + LAND_OFFSET + 10, y: 20, z: 0 }
 ];
 
@@ -51,11 +51,15 @@ const blockDimensionsList = [
 export async function createWorld2(scene) {
     let world2 = new THREE.Group();
 
-    blockDimensionsList.forEach(({ width, height, depth, x, y, z, rotation }) => {
+    blockDimensionsList.forEach(({ width, height, depth, x, y, z, rotation, zPriority }) => {
         const repeatXT = width / 10;
         const repeatZT = depth / 20;
         const repeatXS = width / 20;
         const repeatYS = height / 20;
+
+        if(zPriority === undefined) {
+            zPriority = 0;
+        }
 
         const topTexture = textureTop.clone();
         topTexture.repeat.set(repeatXT, repeatZT);
@@ -80,6 +84,7 @@ export async function createWorld2(scene) {
         block.castShadow = true;
         block.receiveShadow = true;
         if (rotation) block.rotation.z = rotation;
+        block.position.z += zPriority*0.005;
         world2.add(block);
     });
 
