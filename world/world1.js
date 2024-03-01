@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Spikes, StarBox, loadTreeModel, loadGordoModel } from '../src/structure.js';
+import { Tree, Spikes, StarBox, Door, loadTreeModel, loadGordoModel, loadDoorModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const LAND_LENGTH = 300;
@@ -185,6 +185,19 @@ export async function createWorld1(scene) {
     starBox = new StarBox();
     starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, 0);
     scene.add(starBox.mesh);
+
+    //=====< Door >=====//
+    let doorModel = await loadDoorModel();
+    doorModel.scale.set(2, 2, 2);
+    doorModel.position.set(-4, -3, 24);
+    doorModel.rotation.y = Math.PI/2;
+
+    const door = new Door();
+    door.mesh.position.set(LAND_BEGIN_X + LAND_LENGTH - 27, 6, 0);
+    door.mesh.rotation.y = Math.PI/2;
+    door.mesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(door.mesh);
+    door.mesh.add(doorModel);
 }
 
 export async function createEnemy(scene) {

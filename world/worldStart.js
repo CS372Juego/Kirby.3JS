@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, loadTreeModel } from '../src/structure.js';
+import { Tree, Door, loadTreeModel, loadDoorModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLDS_OFFSET_X = -220;
@@ -87,4 +87,17 @@ export async function createWorldS(scene) {
         scene.add(tree.mesh);
         tree.mesh.add(treeModel);
     });
+
+    //=====< Door >=====//
+    let doorModel = await loadDoorModel();
+    doorModel.scale.set(2, 2, 2);
+    doorModel.position.set(-4, -3, 24);
+    doorModel.rotation.y = Math.PI/2;
+
+    const door = new Door();
+    door.mesh.position.set(LAND_END_X + WORLDS_OFFSET_X + 8, 6, 0);
+    door.mesh.rotation.y = Math.PI/2;
+    door.mesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(door.mesh);
+    door.mesh.add(doorModel);
 }

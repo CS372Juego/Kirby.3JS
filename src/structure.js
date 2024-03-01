@@ -156,3 +156,31 @@ export async function loadLeaperModel() {
         }, undefined, reject);
     });
 }
+
+
+export class Door {
+    constructor() {
+        this.mesh = new THREE.Object3D();
+        let geometry = new THREE.BoxGeometry(10, 20, 1);
+        let material = new THREE.MeshPhongMaterial({ visible: false });
+        let door = new THREE.Mesh(geometry, material);
+        door.position.set(0, 0, 0);
+        door.castShadow = true;
+        door.receiveShadow = true;
+        this.mesh.add(door);
+    }
+}
+
+export async function loadDoorModel() {
+    return new Promise((resolve, reject) => {
+        const portalModel = new QuaterniusModel();
+        portalModel.load('../assets/model/portal.glb', Math.PI/2);
+        portalModel.traverse(function (child) {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+        resolve(portalModel);
+    });
+}

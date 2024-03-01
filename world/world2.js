@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Spikes, StarBox, loadTreeModel, loadLeaperModel } from '../src/structure.js';
+import { Tree, Spikes, StarBox, Door, loadTreeModel, loadLeaperModel, loadDoorModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLD2_OFFSET_X = 350;
@@ -162,6 +162,19 @@ export async function createWorld2(scene) {
     starBox = new StarBox();
     starBox.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 272.5, 7.5, -5);
     scene.add(starBox.mesh);
+
+    //=====< Door >=====//
+    let doorModel = await loadDoorModel();
+    doorModel.scale.set(2, 2, 2);
+    doorModel.position.set(-4, -3, 24);
+    doorModel.rotation.y = Math.PI/2;
+
+    const door = new Door();
+    door.mesh.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X + 273, 6, 0);
+    door.mesh.rotation.y = Math.PI/2;
+    door.mesh.scale.set(0.5, 0.5, 0.5);
+    scene.add(door.mesh);
+    door.mesh.add(doorModel);
 }
 
 export async function createEnemy2(scene) {
