@@ -178,6 +178,10 @@ label {
     animation: fadeIn 0.5s ease-out forwards;
 }
 
+.descText {
+    margin-bottom: 10px;
+}
+
 @keyframes shake {
     0% { transform: translateY(0); }
     25% { transform: translateY(-5px); }
