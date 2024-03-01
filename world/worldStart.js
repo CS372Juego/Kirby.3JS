@@ -24,7 +24,7 @@ const blockDimensionsList = [
 ];
 
 /**
- * Creates the world scene with blocks and trees.
+ * Creates the world scene with appropriately configured blocks and trees.
  * @param {THREE.Scene} scene - The scene to add the world to.
  * @returns {Promise<void>} - A promise that resolves when the world is created.
  */
