@@ -198,8 +198,8 @@ function createLights() {
     dirLight2.castShadow = true;
 
     // Set the direction of the light
-    dirLight1.shadow.camera.left = -100;
-    dirLight1.shadow.camera.right = 100;
+    dirLight1.shadow.camera.left = -650;
+    dirLight1.shadow.camera.right = 300; // RIGHT HERE
     dirLight1.shadow.camera.top = 100;
     dirLight1.shadow.camera.bottom = -100;
     dirLight1.shadow.camera.near = 1;
@@ -348,7 +348,7 @@ const baseKirbySpeed = 0.15;
 let kirbySpeed = baseKirbySpeed;
 let onGround = true;
 let yVelocity = 0;
-const jumpSpeed = 0.55;
+const jumpSpeed = 1;
 const gravity = 0.15;
 
 /**
@@ -494,7 +494,6 @@ function updateKirbyPosition(deltaTime) {
     if(onGround) {
         kirby.position.y = groundLevel + KIRBY_SIZE/2;
         yVelocity = 0;
-        console.log("floored");
     }
 
     kirby.position.y += yVelocity * deltaTime * 75;
@@ -742,7 +741,6 @@ function updateEnemyPosition(enemy, speed, deltaTime) {
         enemy.userData.direction = -1;
     }
     enemy.position.x += speed * deltaTime * 1000 * enemy.userData.direction;
-    console.log(enemy.position.x);
 }
 
 function checkCollisionWithEnemy(enemy) {
