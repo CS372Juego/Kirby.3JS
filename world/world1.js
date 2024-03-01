@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Spikes, StarBox, loadTreeModel } from '../src/structure.js';
+import { Tree, Spikes, StarBox, loadTreeModel, loadGordoModel } from '../src/structure.js';
 
 const LAND_WIDTH = 20;
 export const LAND_LENGTH = 300;
@@ -181,3 +181,18 @@ export async function createWorld1(scene) {
     starBox.mesh.position.set(LAND_BEGIN_X + 217, 12.5, 0);
     scene.add(starBox.mesh);
 }
+
+export async function createEnemy(scene) {
+    const enemyModel = await loadGordoModel();
+    
+    enemyModel.scale.set(0.4, 0.4, 0.4);
+    const enemyGeometry = new THREE.SphereGeometry(2, 32, 16);
+    const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false }); // Invisible
+    const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
+
+    enemyCollider.position.set(LAND_BEGIN_X + 135, 7.5, 0);
+    enemyCollider.add(enemyModel);
+    scene.add(enemyCollider);
+    return enemyCollider;
+}
+

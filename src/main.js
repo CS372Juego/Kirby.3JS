@@ -14,8 +14,8 @@ import { ColladaLoader } from 'ColladaLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { SoundManager } from './SoundManager.js';
 import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
-import { createWorld1, LAND_BEGIN_X } from '../world/world1.js';
-import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
+import { createWorld1, LAND_BEGIN_X, createEnemy } from '../world/world1.js';
+import { createWorld2, WORLD2_OFFSET_X, createEnemy2 } from '../world/world2.js';
 import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
 
 //=====< Global Variables >=====//
@@ -33,8 +33,14 @@ let isGameClear = false;
 let walkingAnimationIndex = 2;
 let kirbyHP = 100;
 let hpIncrementInterval;
+let enemy, enemy2;
+let enemyMoveDirection = 1;
+let enemy2MoveDirection = 1;
 
+const enemySpeed = 0.01; 
+const enemy2Speed = 0.01;
 const KIRBY_SIZE = 2.7;
+const ENEMY_RADIUS = 2;
 const SMOOTHNESS = 0.05;
 const CAMERA_SMOOTHNESS = 0.04;
 const LAND_BEGIN = 5;
@@ -722,10 +728,60 @@ async function resetGame() {
     
     document.getElementById('gameOverScreen').style.display = 'none';
 
+    if (enemy) {
+        scene.remove(enemy);
+        enemy = undefined;
+    }
+    enemy = await createEnemy(scene);
+
+    if (enemy2) {
+        scene.remove(enemy2);
+        enemy2 = undefined;
+    }
+    enemy2 = await createEnemy2(scene);
+
     setTimeout(() => {
         soundManager.playSound('restingArea', true);
     }, 1000);
     loop();
+}
+
+//=====< Enemy >=====//
+function updateEnemyPosition(deltaTime) {
+    if (!enemy) return;
+    enemy.position.x += enemySpeed * deltaTime * 1000 * enemyMoveDirection;
+
+    if (enemy.position.x > LAND_BEGIN_X + 163 || enemy.position.x < LAND_BEGIN_X + 126) {
+        enemyMoveDirection *= -1;
+    }
+}
+
+function updateEnemy2Position(deltaTime) {
+    if (!enemy2) return;
+
+    enemy2.position.x += enemy2Speed * deltaTime * 1000 * enemy2MoveDirection;
+
+    if (enemy2.position.x > LAND_BEGIN_X + WORLD2_OFFSET_X + 85 || enemy2.position.x < LAND_BEGIN_X + WORLD2_OFFSET_X + 45) {
+        enemy2MoveDirection *= -1;
+    }
+}
+
+function checkCollisionWithEnemy() {
+    let distance = kirby.position.distanceTo(enemy.position);
+    let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
+    if (distance < sumOfRadii) {
+        return true;
+    }
+    return false;
+}
+
+function checkCollisionWithEnemy2() {
+    let distance = kirby.position.distanceTo(enemy2.position);
+    let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
+    if (distance < sumOfRadii) {
+        return true;
+    }
+    return false;
 }
 
 //=====< Main Animation Loop >=====//
@@ -734,6 +790,13 @@ let lastCollisionCheck = Date.now();
 function loop() {
     const deltaTime = clock.getDelta(); 
     if (!isGameRunning) { return; }
+
+    if (enemy) { 
+        if (enemy.position.x > LAND_BEGIN_X + 165 || enemy.position.x < LAND_BEGIN_X + 125) {
+            enemyMoveDirection *= -1;
+        }
+        enemy.position.x += enemySpeed * deltaTime * enemyMoveDirection;
+    }
 
     let direction = {
         x: 0,
@@ -746,8 +809,14 @@ function loop() {
         lastCollisionCheck = now;
     }
 
+    if (checkCollisionWithEnemy() || checkCollisionWithEnemy2()) {
+        updateHPBar(20);
+    }
+
     handleKeyboardInput(deltaTime, direction);
     updateKirbyPosition(deltaTime);
+    updateEnemyPosition(deltaTime);
+    updateEnemy2Position(deltaTime);
     
     kirbyModel.advanceAnimation(deltaTime);
     alignRotation(kirbyModel, direction);
@@ -816,7 +885,9 @@ async function runScene() {
     await createBackground();
     await createWorldS(scene);
     await createWorld1(scene);
+    enemy = await createEnemy(scene);
     await createWorld2(scene);
+    enemy2 = await createEnemy2(scene);
     await createWorldF(scene);
     await createKirby();
     loop();

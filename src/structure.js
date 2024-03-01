@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Colors } from './color.js';
 import { OBJLoader } from 'OBJLoader';
 import { MTLLoader } from 'MTLLoader';
+import { ColladaLoader } from 'ColladaLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 
 /**
@@ -118,5 +119,40 @@ export async function loadStarModel() {
                 resolve(obj);
             }, undefined, reject);
         });
+    });
+}
+
+export async function loadGordoModel() {
+    return new Promise((resolve, reject) => {
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load('../assets/model/gordo/DolGordo.mtl', (materials) => {
+            materials.preload();
+            const objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.load('../assets/model/gordo/DolGordo.obj', (obj) => {
+                obj.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                resolve(obj);
+            }, undefined, reject);
+        });
+    });
+}
+
+export async function loadLeaperModel() {
+    return new Promise((resolve, reject) => {
+        const colladaLoader = new ColladaLoader();
+        colladaLoader.load('../assets/model/leaper/Model_fix.dae', (collada) => {
+            collada.scene.traverse(function (child) {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            resolve(collada.scene);
+        }, undefined, reject);
     });
 }
