@@ -85,14 +85,19 @@ export class StarBox {
  * @class
  */
 export class Star {
+    #star;
     constructor(){
         this.mesh = new THREE.Object3D();
         let geometryStar = new THREE.CylinderGeometry(5, 5, 2, 5);
         let materialStar = new THREE.MeshPhongMaterial({ visible: false });
-        let star = new THREE.Mesh(geometryStar, materialStar);
-        star.position.set(0, 0, 0);
-        star.rotation.x = -Math.PI / 2;
-        this.mesh.add(star);
+        this.#star = new THREE.Mesh(geometryStar, materialStar);
+        this.#star.position.set(0, 0, 0);
+        this.#star.rotation.x = -Math.PI / 2;
+        this.mesh.add(this.#star);
+    }
+
+    spin() {
+        this.#star.rotation.x += 0.1;
     }
 }
 
