@@ -3,7 +3,7 @@
 - CS372 Final Project
 ------
 ## How to Play
-- WASD
+- Controls: WASD (press "esc" key to see controls)
 - Space: Jump
 - Shift + WASD: Sprint
 - UpArrow: Teleport!
@@ -22,9 +22,6 @@
 - Game Logic
     - Lives
     - Items (HP/Heal)
-    - Enemy
-- Aesthetics
-    - Better Lighting & Shadow
 - Performance
     - Optimization
     - Various Framerate Support
