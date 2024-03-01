@@ -192,6 +192,12 @@ export async function createWorld1(scene) {
     doorModel.position.set(-4, -3, 24);
     doorModel.rotation.y = Math.PI/2;
 
+    doorModel.traverse((child) => {
+        if (child.isMesh) {
+            child.raycast = function () {};
+        }
+    });
+
     const door = new Door();
     door.mesh.position.set(LAND_BEGIN_X + LAND_LENGTH - 27, 6, 0);
     door.mesh.rotation.y = Math.PI/2;
@@ -202,8 +208,13 @@ export async function createWorld1(scene) {
 
 export async function createEnemy(scene) {
     const enemyModel = await loadGordoModel();
-    
     enemyModel.scale.set(0.4, 0.4, 0.4);
+    enemyModel.traverse((child) => {
+        if (child.isMesh) {
+            child.raycast = function () {};
+        }
+    });
+
     const enemyGeometry = new THREE.SphereGeometry(2, 32, 16);
     const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false }); // Invisible
     const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
