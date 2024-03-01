@@ -143,6 +143,7 @@ function createAudio() {
         { name: 'select', url: '../assets/audio/SE/select.wav', options: { loop: false, volume: 0.5 }},
         { name: 'pause', url: '../assets/audio/SE/pause.wav', options: { loop: false, volume: 0.4 }},
         { name: 'damage', url: '../assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
+        { name: 'getStar', url: '../assets/audio/SE/getStar.wav', options: { loop: false, volume: 0.5 }},
         { name: 'lowhp', url: '../assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
         { name: 'hpup', url: '../assets/audio/SE/hpup.wav', options: { loop: false, volume: 0.4 }},
         { name: 'die', url: '../assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
@@ -805,6 +806,9 @@ function loop() {
         canPlaySounds = false;
         hasPlayedClearSound = true;
         isGameClear = true;
+        setTimeout(() => {
+            soundManager.playSound('getStar');
+        }, 100);
         gameOver();
     }
 
