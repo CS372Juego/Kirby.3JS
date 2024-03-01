@@ -240,8 +240,8 @@ async function createBackground() {
         const collada = await loadModel();
         let dae = collada.scene;
 
-        dae.scale.set(5, 5, 5);
-        dae.position.set(-50, -30, -50);
+        dae.scale.set(10, 10, 10);
+        dae.position.set(-400, 0, -20);
 
         // To get rid of black bounding boxes
         dae.traverse((child) => {
@@ -288,7 +288,7 @@ async function createKirby() {
         // Positions for debugging
         // kirby.position.set(LAND_BEGIN_X, 7, 0);
         // kirby.position.set(LAND_BEGIN_X + WORLD2_OFFSET_X, 7, 0);
-        // kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
+        kirby.position.set(LAND_BEGIN_X + WORLDF_OFFSET_X + 100, 7, 0);
 
         scene.add(kirby);
 
