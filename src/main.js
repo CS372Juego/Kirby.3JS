@@ -32,6 +32,7 @@ let hasPlayedClearSound = false;
 let isGameClear = false;
 let walkingAnimationIndex = 2;
 let kirbyHP = 100;
+let hpIncrementInterval;
 
 const KIRBY_SIZE = 2.7;
 const SMOOTHNESS = 0.05;
@@ -587,11 +588,17 @@ function teleportKirby(destination, origin) {
     targetPosition.z = destination.z;
     updateWorldMusic();
 
-    // Check if Kirby teleported to the resting area by comparing coordinates
+    // Clear any existing HP increment interval
+    if (hpIncrementInterval !== null) {
+        clearInterval(hpIncrementInterval);
+        hpIncrementInterval = null;
+    }
+
+    // Start a new HP increment interval only if Kirby teleports to the resting area
     if (Math.abs(destination.x - WORLDS_OFFSET_X - 30) < 5 && kirbyHP < 100) {
-        let hpIncrementInterval = setInterval(incrementHP, 50);
+        hpIncrementInterval = setInterval(incrementHP, 50);
         soundManager.playSound('hpup');
-        console.log('Teleported to resting area, HP restored.');
+        console.log('Teleported to resting area, HP restoring.');
     }
 }
 
