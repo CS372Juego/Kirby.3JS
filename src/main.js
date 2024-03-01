@@ -731,6 +731,12 @@ async function resetGame() {
 }
 
 //=====< Enemy >=====//
+/**
+ * Updates the position of an enemy object based on its speed and deltaTime.
+ * @param {Object3D} enemy - The enemy object to update.
+ * @param {number} speed - The speed at which the enemy moves.
+ * @param {number} deltaTime - The time elapsed since the last update.
+ */
 function updateEnemyPosition(enemy, speed, deltaTime) {
     if (!enemy) return;
     if (enemy.position.x < enemy.userData.leftBound) {
@@ -743,6 +749,11 @@ function updateEnemyPosition(enemy, speed, deltaTime) {
     enemy.position.x += speed * deltaTime * 1000 * enemy.userData.direction;
 }
 
+/**
+ * Checks for collision between Kirby and an enemy.
+ * @param {Object} enemy - The enemy object to check collision with.
+ * @returns {boolean} - Returns true if collision occurs, false otherwise.
+ */
 function checkCollisionWithEnemy(enemy) {
     let distance = kirby.position.distanceTo(enemy.position);
     let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;

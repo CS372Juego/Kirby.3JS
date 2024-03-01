@@ -187,31 +187,6 @@ export async function createWorld1(scene) {
     scene.add(starBox.mesh);
 
     //=====< Door >=====//
-    // Attempt to clone the door model
-    // const SharedDoorModel = await loadDoorModel();
-    // const doorPositions = [
-    //     {x: LAND_BEGIN_X + LAND_LENGTH - 27, y: 6, z: 0},
-    //     {x: LAND_BEGIN_X + 10, y: 6, z: 0},
-    // ];
-    // doorPositions.forEach(position => {
-    //     let doorModel = SharedDoorModel.clone();
-    //     doorModel.traverse((child) => {
-    //         if (child.isMesh) {
-    //             child.raycast = function () {};
-    //         }
-    //     });
-    //     doorModel.scale.set(2, 2, 2);
-    //     doorModel.position.set(-4, -3, 24);
-    //     doorModel.rotation.y = Math.PI/2;
-
-    //     const door = new Door();
-    //     door.mesh.position.set(position.x, position.y, position.z);
-    //     door.mesh.rotation.y = Math.PI/2;
-    //     door.mesh.scale.set(0.5, 0.5, 0.5);
-    //     scene.add(door.mesh);
-    //     door.mesh.add(doorModel);
-    // });
-
     let doorModel = await loadDoorModel();
     doorModel.scale.set(2, 2, 2);
     doorModel.position.set(-4, -3, 24);
@@ -243,23 +218,4 @@ export async function createWorld1(scene) {
     anotherDoor.mesh.scale.set(0.5, 0.5, 0.5);
     scene.add(anotherDoor.mesh);
     anotherDoor.mesh.add(anotherDoorModel);
-}
-
-export async function createEnemy(scene) {
-    const enemyModel = await loadGordoModel();
-    enemyModel.scale.set(0.4, 0.4, 0.4);
-    enemyModel.traverse((child) => {
-        if (child.isMesh) {
-            child.raycast = function () {};
-        }
-    });
-
-    const enemyGeometry = new THREE.SphereGeometry(2, 32, 16);
-    const enemyMaterial = new THREE.MeshBasicMaterial({ visible: false }); // Invisible
-    const enemyCollider = new THREE.Mesh(enemyGeometry, enemyMaterial);
-
-    enemyCollider.position.set(LAND_BEGIN_X + 135, 7.5, 0);
-    enemyCollider.add(enemyModel);
-    scene.add(enemyCollider);
-    return enemyCollider;
 }

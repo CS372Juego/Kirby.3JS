@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Colors } from './color.js';
 import { OBJLoader } from 'OBJLoader';
 import { MTLLoader } from 'MTLLoader';
-import { ColladaLoader } from 'ColladaLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 
 /**
@@ -122,6 +121,10 @@ export async function loadStarModel() {
     });
 }
 
+/**
+ * Loads the Gordo model asynchronously.
+ * @returns {Promise<THREE.Object3D>} A promise that resolves with the loaded Gordo model as a THREE.Object3D.
+ */
 function loadGordoModel() {
     return new Promise((resolve, reject) => {
         const mtlLoader = new MTLLoader();
@@ -142,6 +145,16 @@ function loadGordoModel() {
     });
 }
 
+/**
+ * Creates an enemy object with the specified parameters.
+ * @param {number} x - The x-coordinate of the enemy's position.
+ * @param {number} y - The y-coordinate of the enemy's position.
+ * @param {number} z - The z-coordinate of the enemy's position.
+ * @param {number} leftBound - The left boundary of the enemy's movement range.
+ * @param {number} rightBound - The right boundary of the enemy's movement range.
+ * @param {THREE.Scene} scene - The scene to which the enemy will be added.
+ * @returns {Promise<THREE.Mesh>} A promise that resolves to the created enemy collider mesh.
+ */
 export function createEnemy(x, y, z, leftBound, rightBound, scene) {
     return loadGordoModel().then((gordoModel) => {
         const enemyModel = gordoModel;
@@ -164,22 +177,6 @@ export function createEnemy(x, y, z, leftBound, rightBound, scene) {
     });
 }
 
-export async function loadLeaperModel() {
-    return new Promise((resolve, reject) => {
-        const colladaLoader = new ColladaLoader();
-        colladaLoader.load('../assets/model/leaper/Model_fix.dae', (collada) => {
-            collada.scene.traverse(function (child) {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
-            resolve(collada.scene);
-        }, undefined, reject);
-    });
-}
-
-
 export class Door {
     constructor() {
         this.mesh = new THREE.Object3D();
@@ -193,6 +190,10 @@ export class Door {
     }
 }
 
+/**
+ * Loads the door model asynchronously.
+ * @returns {Promise<QuaterniusModel>} A promise that resolves with the loaded door model.
+ */
 export async function loadDoorModel() {
     return new Promise((resolve, reject) => {
         const portalModel = new QuaterniusModel();
