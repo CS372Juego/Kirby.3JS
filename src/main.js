@@ -825,7 +825,7 @@ function alignRotation(obj, vel) {
         let targetRotation = new THREE.Quaternion();
         targetRotation.setFromEuler(new THREE.Euler(0, targetAngle, 0));
         obj.quaternion.rotateTowards(targetRotation, 0.1);
-        console.log(kirby.position);
+        // console.log(kirby.position);
     }
 }
 

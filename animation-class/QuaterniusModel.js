@@ -46,7 +46,7 @@ export class QuaterniusModel extends THREE.Object3D {
             bound.expandByObject(child);
             child.geometry.computeBoundingBox();
           }
-          console.log(bound.min, bound.max);
+          // console.log(bound.min, bound.max);
          
         });
 
