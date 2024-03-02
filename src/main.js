@@ -751,7 +751,7 @@ function updateEnemyPosition(enemy, speed, deltaTime) {
 function checkCollisionWithEnemy(enemy) {
     let distance = kirby.position.distanceTo(enemy.position);
     let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
-    if (distance < sumOfRadii) {
+    if (distance < sumOfRadii + 5) {
         return true;
     }
     return false;
