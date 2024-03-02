@@ -749,9 +749,10 @@ function updateEnemyPosition(enemy, speed, deltaTime) {
  * @returns {boolean} - Returns true if collision occurs, false otherwise.
  */
 function checkCollisionWithEnemy(enemy) {
-    let distance = kirby.position.distanceTo(enemy.position);
+    let enemyPosition = new THREE.Vector3(enemy.position.x, enemy.position.y+4, enemy.position.z);
+    let distance = kirby.position.distanceTo(enemyPosition);
     let sumOfRadii = KIRBY_SIZE / 2 + ENEMY_RADIUS;
-    if (distance < sumOfRadii + 5) {
+    if (distance < sumOfRadii + 3) {
         return true;
     }
     return false;
