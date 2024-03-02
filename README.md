@@ -7,8 +7,8 @@
 - Controls: WASD (press "esc" key to see controls)
 - Space: Jump
 - Shift + WASD: Sprint
-- UpArrow: Teleport!
-    - Teleport at the end of the world
+- UpArrow Key: Go through portal
+    - Portals go to the next stage
 - Click [here](https://students.cs.calvin.edu/~jk254/372/proj6/) to play!
 
 ------
