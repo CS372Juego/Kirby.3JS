@@ -14,10 +14,10 @@ import { ColladaLoader } from 'ColladaLoader';
 import { QuaterniusModel } from '../animation-class/QuaterniusModel.js';
 import { SoundManager } from './SoundManager.js';
 import { createEnemy } from './structure.js';
-import { createWorldS, WORLDS_OFFSET_X } from '../world/worldStart.js';
-import { createWorld1, LAND_BEGIN_X } from '../world/world1.js';
-import { createWorld2, WORLD2_OFFSET_X } from '../world/world2.js';
-import { createWorldF, WORLDF_OFFSET_X } from '../world/finalworld.js';
+import { createWorldS, WORLDS_OFFSET_X } from './world/worldStart.js';
+import { createWorld1, LAND_BEGIN_X } from './world/world1.js';
+import { createWorld2, WORLD2_OFFSET_X } from './world/world2.js';
+import { createWorldF, WORLDF_OFFSET_X } from './world/finalworld.js';
 
 //=====< Global Variables >=====//
 let scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH, renderer;
