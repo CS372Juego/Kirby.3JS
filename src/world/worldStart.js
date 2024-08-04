@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tree, Door, loadTreeModel, loadDoorModel } from '../src/structure.js';
+import { Tree, Door, loadTreeModel, loadDoorModel } from '../structure.js';
 
 const LAND_WIDTH = 20;
 export const WORLDS_OFFSET_X = -220;
