@@ -26,7 +26,7 @@ export class Tree {
  */
 export async function loadTreeModel() {
     const treeModel = new QuaterniusModel();
-    await treeModel.load('../assets/model/tree.glb', Math.PI/2);
+    await treeModel.load('./assets/model/tree.glb', Math.PI/2);
     treeModel.traverse(function (child) {
         if (child.isMesh) {
             child.castShadow = true;
@@ -68,7 +68,7 @@ export class StarBox {
     constructor() {
         this.mesh = new THREE.Object3D();
         const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('../assets/texture/starbox.png');
+        const texture = textureLoader.load('./assets/texture/starbox.png');
 
         let geoBox = new THREE.BoxGeometry(5, 5, 5);
         let matBox = new THREE.MeshPhongMaterial({ map: texture });
@@ -109,11 +109,11 @@ export async function loadStarModel() {
     return new Promise((resolve, reject) => {
         const mtlLoader = new MTLLoader();
 
-        mtlLoader.load('../assets/model/star/WarpStar.mtl', (materials) => {
+        mtlLoader.load('./assets/model/star/WarpStar.mtl', (materials) => {
             materials.preload();
             const objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load('../assets/model/star/WarpStar.obj', (obj) => {
+            objLoader.load('./assets/model/star/WarpStar.obj', (obj) => {
                 obj.traverse(function (child) {
                     if (child.isMesh) {
                         child.castShadow = true;
@@ -133,11 +133,11 @@ export async function loadStarModel() {
 function loadGordoModel() {
     return new Promise((resolve, reject) => {
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('../assets/model/gordo/DolGordo.mtl', (materials) => {
+        mtlLoader.load('./assets/model/gordo/DolGordo.mtl', (materials) => {
             materials.preload();
             const objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load('../assets/model/gordo/DolGordo.obj', (obj) => {
+            objLoader.load('./assets/model/gordo/DolGordo.obj', (obj) => {
                 obj.traverse(function (child) {
                     if (child.isMesh) {
                         child.castShadow = true;
@@ -202,7 +202,7 @@ export class Door {
 export async function loadDoorModel() {
     return new Promise((resolve, reject) => {
         const portalModel = new QuaterniusModel();
-        portalModel.load('../assets/model/portal.glb', Math.PI/2);
+        portalModel.load('./assets/model/portal.glb', Math.PI/2);
         portalModel.traverse(function (child) {
             if (child.isMesh) {
                 child.castShadow = true;

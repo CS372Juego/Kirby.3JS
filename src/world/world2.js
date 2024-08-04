@@ -10,8 +10,8 @@ export const LAND_BEGIN_X2 = -LAND_LENGTH / 2 + LAND_OFFSET;
 const LAND_END_X = LAND_LENGTH / 2 - LAND_OFFSET;
 
 const loader = new THREE.TextureLoader();
-const textureTop = loader.load('../../assets/texture/grass.png');
-const textureSides = loader.load('../../assets/texture/darkdirt.png');
+const textureTop = loader.load('../assets/texture/grass.png');
+const textureSides = loader.load('../assets/texture/darkdirt.png');
 
 textureTop.wrapS = textureTop.wrapT = THREE.RepeatWrapping;
 textureSides.wrapS = textureSides.wrapT = THREE.RepeatWrapping;
