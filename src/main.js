@@ -851,7 +851,7 @@ window.onload = function() {
 
 document.getElementById('playButton').addEventListener('click', async function() {
     showLoadingScreen();
-    await init();
+    init();
     hideLoadingScreen();
     fadeOutTitleScreen();
     updateHPBar(0);
@@ -865,9 +865,9 @@ function hideLoadingScreen() {
     document.getElementById('loadingScreen').style.display = 'none';
 }
 
-async function init(event) {
+function init(event) {
     createScene();
-    await runScene();
+    runScene();
 }
 
 async function runScene() {
