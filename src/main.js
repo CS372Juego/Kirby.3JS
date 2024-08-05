@@ -147,21 +147,21 @@ function createAudio() {
     // Load sounds
     // https://downloads.khinsider.com/game-soundtracks/album/kirby-super-star-ultra
     const sounds = [
-        { name: 'jump', url: './assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
-        { name: 'teleport', url: './assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
-        { name: 'select', url: './assets/audio/SE/select.wav', options: { loop: false, volume: 0.5 }},
-        { name: 'pause', url: './assets/audio/SE/pause.wav', options: { loop: false, volume: 0.4 }},
-        { name: 'damage', url: './assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
-        { name: 'getStar', url: './assets/audio/SE/getStar.wav', options: { loop: false, volume: 0.5 }},
-        { name: 'lowhp', url: './assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
-        { name: 'hpup', url: './assets/audio/SE/hpup.wav', options: { loop: false, volume: 0.4 }},
-        { name: 'die', url: './assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
-        { name: 'dead', url: './assets/audio/SE/dead.wav', options: { loop: false, volume: 0.3 }},
-        { name: 'restingArea', url: './assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
-        { name: 'world1', url: './assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
-        { name: 'world2', url: './assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
-        { name: 'finalWorld', url: './assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.2 }},
-        { name: 'clear', url: './assets/audio/BGM/clear.mp3', options: { loop: false, volume: 0.5 }},
+        { name: 'jump', url: 'src/assets/audio/SE/jump.wav', options: { loop: false, volume: 0.9 }},
+        { name: 'teleport', url: 'src/assets/audio/SE/teleport.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'select', url: 'src/assets/audio/SE/select.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'pause', url: 'src/assets/audio/SE/pause.wav', options: { loop: false, volume: 0.4 }},
+        { name: 'damage', url: 'src/assets/audio/SE/damage.wav', options: { loop: false, volume: 0.7 }},
+        { name: 'getStar', url: 'src/assets/audio/SE/getStar.wav', options: { loop: false, volume: 0.5 }},
+        { name: 'lowhp', url: 'src/assets/audio/SE/lowhp.wav', options: { loop: false, volume: 0.4 }},
+        { name: 'hpup', url: 'src/assets/audio/SE/hpup.wav', options: { loop: false, volume: 0.4 }},
+        { name: 'die', url: 'src/assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
+        { name: 'dead', url: 'src/assets/audio/SE/dead.wav', options: { loop: false, volume: 0.3 }},
+        { name: 'restingArea', url: 'src/assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
+        { name: 'world1', url: 'src/assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
+        { name: 'world2', url: 'src/assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
+        { name: 'finalWorld', url: 'src/assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.2 }},
+        { name: 'clear', url: 'src/assets/audio/BGM/clear.mp3', options: { loop: false, volume: 0.5 }},
     ];
 
     Promise.all(sounds.map(sound => 
@@ -233,7 +233,7 @@ async function createBackground() {
         // Wrap the loader in a promise
         const loadModel = () => {
             return new Promise((resolve, reject) => {
-                colladaLoader.load('./assets/model/forest/log_fix.dae', (collada) => {
+                colladaLoader.load('src/assets/model/forest/log_fix.dae', (collada) => {
                     resolve(collada); // Resolve the promise with the loaded model
                 }, undefined, (error) => {
                     reject(error); // Reject the promise if there's an error
