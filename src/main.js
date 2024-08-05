@@ -35,6 +35,7 @@ let walkingAnimationIndex = 2;
 let kirbyHP = 100;
 let hpIncrementInterval;
 let enemies = [];
+let isLoading = true;
 
 // Kinematic variables
 const KIRBY_SIZE = 2.7;
@@ -168,7 +169,7 @@ function createAudio() {
         soundManager.loadSound(sound.name, sound.url, sound.options)
     )).then(() => {
         console.log("All sounds loaded");
-        
+        isLoading = false;
     }).catch(err => console.error("Error loading sounds:", err));
 }
 
@@ -849,6 +850,11 @@ window.onload = function() {
 };
 
 function init(event) {
+    // Make sure that necessary assets are loaded before starting the game
+    if (isLoading) {
+        setTimeout(init, 500);
+        return;
+    }
     createScene();
     runScene();
 }
