@@ -9,8 +9,7 @@
 - Shift + WASD: Sprint
 - UpArrow Key: Go through portal
     - Portals go to the next stage
-- Click [here](https://students.cs.calvin.edu/~jk254/372/proj6/) to play!
-- Click [here](https://cs372juego.github.io/Kirby.3JS/) to play! (GitHub Pages)
+- Click [here](https://cs372juego.github.io/Kirby.3JS/) to play!
 
 ------
 ### Licenses
