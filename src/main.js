@@ -125,6 +125,8 @@ function createScene() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
     window.addEventListener('resize', handleWindowResize, false);
+
+    console.log("Scene, camera, and renderer created");
 }
 
 //=====< Handle the window resize event >=====//
@@ -221,6 +223,8 @@ function createLights() {
     scene.add(hemisphereLight);
     scene.add(dirLight1);
     scene.add(dirLight2);
+
+    console.log("Lights added to scene");
 }
 
 //=====< Add Background >=====//
@@ -843,73 +847,89 @@ function alignRotation(obj, vel) {
 //=====< Initialize >=====//
 window.onload = function() {
     document.getElementById('playButton').addEventListener('click', function() {
+        showLoadingScreen();
         init();
         fadeOutTitleScreen();
         updateHPBar(0);
     });
 };
 
-document.getElementById('playButton').addEventListener('click', async function() {
-    showLoadingScreen();
-    init();
-    hideLoadingScreen();
-    fadeOutTitleScreen();
-    updateHPBar(0);
-});
+let loadingScreen = document.getElementById('loadingScreen');
 
 function showLoadingScreen() {
-    document.getElementById('loadingScreen').style.display = 'block';
+    loadingScreen.style.display = 'flex';
+    loadingScreen.style.transition = "opacity 0.5s ease-out";
+    loadingScreen.style.opacity = 1;
 }
 
 function hideLoadingScreen() {
-    document.getElementById('loadingScreen').style.display = 'none';
+    loadingScreen.style.transition = "opacity 0.5s ease-out";
+    loadingScreen.style.opacity = 0;
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+    });
 }
 
 function init(event) {
     createScene();
-    runScene();
+    showLoadingScreen();
+    runScene().then(() => {
+        hideLoadingScreen();
+    });
 }
 
 async function runScene() {
     createLights();
     createAudio();
-    // Play recovery music by default
-    setTimeout(() => {
-        soundManager.playSound('restingArea', true);
-    }, 1000);
-    await createBackground();
-    await createWorldS(scene);
-    await createWorld1(scene);
-    await createWorld2(scene);
-    await createWorldF(scene);
-    await createKirby();
 
-    // Initialize enemies at given positions with given "patrol" boundaries.
-    (async () => {
-        try {
-            let enemy = await createEnemy(400, 73, 0, 387, 403, scene);
-            enemies.push(enemy);
+    // Create a list of all async tasks
+    const tasks = [
+        // Play recovery music by default
+        new Promise(resolve => setTimeout(() => {
+            soundManager.playSound('restingArea', true);
+            resolve();
+        }, 1000)),
+        createBackground(),
+        createWorldS(scene),
+        createWorld1(scene),
+        createWorld2(scene),
+        createWorldF(scene),
+        createKirby(),
+        loadEnemies()
+    ];
 
-            enemy = await createEnemy(-50, 17, 0, -63, -47, scene);
-            enemies.push(enemy);
+    // Wait for all tasks to complete
+    await Promise.all(tasks);
 
-            enemy = await createEnemy(300, 68, 0, 292, 317, scene);
-            enemies.push(enemy);
+    console.log("Objects added to scene");
 
-            enemy = await createEnemy(220, 22, 2, 212, 262, scene);
-            enemies.push(enemy);
-
-            enemy = await createEnemy(-8, 7, 0, -9, 27, scene);
-            enemies.push(enemy);
-
-            enemy = await createEnemy(-25, 7, 0, -37, -19, scene);
-            enemies.push(enemy);
-        } catch (error) {
-            console.error("Error loading model:", error);
-        }
-    })();
     loop();
 }
+
+async function loadEnemies() {
+    try {
+        let enemy = await createEnemy(400, 73, 0, 387, 403, scene);
+        enemies.push(enemy);
+
+        enemy = await createEnemy(-50, 17, 0, -63, -47, scene);
+        enemies.push(enemy);
+
+        enemy = await createEnemy(300, 68, 0, 292, 317, scene);
+        enemies.push(enemy);
+
+        enemy = await createEnemy(220, 22, 2, 212, 262, scene);
+        enemies.push(enemy);
+
+        enemy = await createEnemy(-8, 7, 0, -9, 27, scene);
+        enemies.push(enemy);
+
+        enemy = await createEnemy(-25, 7, 0, -37, -19, scene);
+        enemies.push(enemy);
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
+}
+
 
 /**
  * Fades out the title screen and displays the game container and health bar.
