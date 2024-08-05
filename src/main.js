@@ -888,7 +888,7 @@ async function runScene() {
         new Promise(resolve => setTimeout(() => {
             soundManager.playSound('restingArea', true);
             resolve();
-        }, 1000)),
+        }, 1500)),
         createBackground(),
         createWorldS(scene),
         createWorld1(scene),
