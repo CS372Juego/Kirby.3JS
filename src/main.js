@@ -849,14 +849,25 @@ window.onload = function() {
     });
 };
 
-function init(event) {
-    // Make sure that necessary assets are loaded before starting the game
-    if (isLoading) {
-        setTimeout(init, 500);
-        return;
-    }
+document.getElementById('playButton').addEventListener('click', async function() {
+    showLoadingScreen();
+    await init();
+    hideLoadingScreen();
+    fadeOutTitleScreen();
+    updateHPBar(0);
+});
+
+function showLoadingScreen() {
+    document.getElementById('loadingScreen').style.display = 'block';
+}
+
+function hideLoadingScreen() {
+    document.getElementById('loadingScreen').style.display = 'none';
+}
+
+async function init(event) {
     createScene();
-    runScene();
+    await runScene();
 }
 
 async function runScene() {
