@@ -305,7 +305,7 @@ async function createKirby() {
         };
 
         kirbyModel = new QuaterniusModel();
-        await kirbyModel.load('./assets/model/kirby.glb', Math.PI/2);
+        await kirbyModel.load('src/assets/model/kirby.glb', Math.PI/2);
 
         // Cue idle animation to start
         kirbyModel.cueAnimation(0, true, 0);
