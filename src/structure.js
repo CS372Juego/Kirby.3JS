@@ -202,7 +202,7 @@ export class Door {
 export async function loadDoorModel() {
     return new Promise((resolve, reject) => {
         const portalModel = new QuaterniusModel();
-        portalModel.load('./assets/model/portal.glb', Math.PI/2);
+        portalModel.load('src/assets/model/portal.glb', Math.PI/2);
         portalModel.traverse(function (child) {
             if (child.isMesh) {
                 child.castShadow = true;
