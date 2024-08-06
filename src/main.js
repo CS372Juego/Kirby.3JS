@@ -851,6 +851,14 @@ window.onload = function() {
         init();
         fadeOutTitleScreen();
         updateHPBar(0);
+
+        // Turn off help text after 3 seconds
+        let helpText = document.getElementById('helpText');
+        setTimeout(() => {
+            helpText.style.transition = "opacity 0.9s ease-out";
+            helpText.style.opacity = 0;
+            console.log("Help text hidden");
+        } , 3000);
     });
 };
 
