@@ -160,7 +160,7 @@ function createAudio() {
         { name: 'hpup', url: 'src/assets/audio/SE/hpup.wav', options: { loop: false, volume: 0.4 }},
         { name: 'die', url: 'src/assets/audio/SE/die.mp3', options: { loop: false, volume: 0.4 }},
         { name: 'dead', url: 'src/assets/audio/SE/dead.wav', options: { loop: false, volume: 0.3 }},
-        { name: 'restingArea', url: 'src/assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.8 }},
+        { name: 'restingArea', url: 'src/assets/audio/BGM/recovery.mp3', options: { loop: true, volume: 0.7 }},
         { name: 'world1', url: 'src/assets/audio/BGM/greengreens.mp3', options: { loop: true, volume: 0.5 }},
         { name: 'world2', url: 'src/assets/audio/BGM/bubbyclouds.mp3', options: { loop: true, volume: 0.5 }},
         { name: 'finalWorld', url: 'src/assets/audio/BGM/end.mp3', options: { loop: false, volume: 0.2 }},
